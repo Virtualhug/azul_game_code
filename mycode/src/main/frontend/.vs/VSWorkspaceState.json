@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\public",
+    "\\src",
+    "\\src\\components",
+    "\\src\\components\\playerBoard",
+    "\\src\\components\\Tile",
+    "\\src\\components\\tilePool"
+  ],
+  "SelectedNode": "\\src\\App.js",
+  "PreviewInSolutionExplorer": false
+}

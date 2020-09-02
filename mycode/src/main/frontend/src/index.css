@@ -1,0 +1,260 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+    box-sizing: border-box;
+    border: 1px solid black;
+}
+
+.main_window {
+    height: 600px;
+    width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    z-index: 0;
+    position: relative;
+}
+
+.scoreboard_left {
+    height: 600px;
+    width: 40px;
+    background: red;
+    z-index: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+.scoreboard_right {
+    height: 600px;
+    width: 40px;
+    background: red;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+.scoreboard_top {
+    height: 40px;
+    width: 1024px;
+    background: red;
+}
+
+.scoreboard_bottom {
+    height: 40px;
+    width: 1024px;
+    background: red;
+    position: absolute;
+    bottom: 0px;
+}
+
+.main_player_board {
+    height: 300px;
+    width: 505px;
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+}
+
+.scoring_tiles {
+    height: 250px;
+    width: 500px;
+}
+
+.awaiting_tiles {
+    width: 250px;
+    height: 250px;
+    position: absolute;
+    bottom: 48px;
+    right: 252px;
+    padding-top: 2px;
+    margin-top: 5px;
+}
+
+.awaiting_tile_row {
+    height: 40px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+    .awaiting_tile_row:hover {
+        cursor: pointer;
+    }
+
+.played_tiles {
+    width: 250px;
+    height: 250px;
+    position: absolute;
+    right: 1px;
+    bottom: 48px;
+}
+
+.played_tiles_grid {
+    margin-left: 5px;
+}
+
+.gridItem {
+    height: 40px;
+    width: 40px;
+    margin-top: 5px;
+    display: inline-table;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.negative_tiles {
+    position: absolute;
+    bottom: 0px;
+    right: 1px;
+    height: 50px;
+    width: 400px;
+}
+
+    .negative_tiles:hover {
+        cursor: pointer;
+    }
+
+.actualNegativeTile {
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+    margin-top: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.playerHand {
+    position: absolute;
+    bottom: 0px;
+    right: 401px;
+    height: 50px;
+    width: 100px;
+}
+
+    .playerHand > label {
+        display: inline-block;
+    }
+
+    .playerHand > p {
+        width: 30px;
+    }
+
+.bowl_area {
+    height: 518px;
+    width: 230px;
+    position: absolute;
+    top: 40px;
+    left: 40px;
+}
+
+.tile_bowl {
+    height: 90px;
+    width: 90px;
+    display: inline-block;
+    margin: 5px;
+    border-radius: 50px;
+    text-align: center;
+}
+
+    .tile_bowl:hover {
+        cursor: pointer;
+    }
+
+.unplayed_tile {
+    height: 20px;
+    width: 20px;
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+    .unplayed_tile:hover {
+        height: 21px;
+        width: 21px;
+    }
+
+.empty_played_tile {
+    margin-top: 2px;
+    margin-left: 2px;
+    height: 35px;
+    width: 35px;
+    border: 2px solid white;
+}
+
+.filled_played_tile {
+    margin-top: 2px;
+    margin-left: 2px;
+    height: 35px;
+    width: 35px;
+    border: 2px solid black;
+}
+
+.free_tile_area {
+    height: 518px;
+    width: 205px;
+    position: absolute;
+    top: 40px;
+    left: 270px;
+}
+
+.testButton {
+    position: absolute;
+    top: 100px;
+    right: 100px;
+}
+
+.testLabel {
+    position: absolute;
+    top: 130px;
+    right: 100px;
+}
+
+.gameName {
+    position: absolute;
+    top: 190px;
+    right: 100px;
+}
+
+.playerName {
+    position: absolute;
+    top: 220px;
+    right: 100px;
+}
+
+.testArray {
+    position: absolute;
+    top: 160px;
+    right: 100px;
+}
+
+.tilesList {
+    position: absolute;
+    top: 100px;
+    right: 200px;
+}
+
+.discardList {
+    position: absolute;
+    top: 100px;
+    right: 400px;
+}
+
+.playerScore {
+    position: absolute;
+    top: 40px;
+    right: 250px;
+    width: 300px;
+}
