@@ -2,6 +2,7 @@ package com.azulcode.mycode.model.playerComps;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+// these are added to the final score grid
 public class ScoringTilePiece {
 
 	public @JsonProperty("colour") final String colour;

@@ -12,18 +12,21 @@ public class Player {
 	public @JsonProperty("isPlayerFirst")boolean isPlayerFirst = false;
 	public @JsonProperty("playerScore") int playerScore = 0;
 	
+	// the player hand data
 	public @JsonProperty("handSize")int handSize = 0;
 	public @JsonProperty("handColour")String handColour = "";
 	public @JsonProperty("playerHand")ArrayList<UnplayedTile> playerHand = new ArrayList<UnplayedTile>();
+	
+	// the awaiting rows array
 	public @JsonProperty("awaitingRows")AwaitingRowPiece [] awaitingRows = new AwaitingRowPiece[5];
 	
 	
-	
+	// number of negative tiles the player has, and the negative scoring tile array
 	public @JsonProperty("negativeTilesCount")int negativeTiles = 0; 
 	private @JsonProperty("negativeScoreTrack")NegativeScoringTile [] negativeScoreTrack = {new NegativeScoringTile(0, -1), new NegativeScoringTile(1, -1),new NegativeScoringTile(2, -2), new NegativeScoringTile(3, -2), new NegativeScoringTile(4, -2), new NegativeScoringTile(5, -3), new NegativeScoringTile(6, -3)};
 	
-	//private ArrayList<ArrayList<ScoringTilePiece>> scoringArea = new ArrayList<ArrayList<ScoringTilePiece>>();
 	
+	// 2d array of the scoring grid. When one player completes an entire row, the game enters its last round
 	private @JsonProperty("scoringTilesArray")ScoringTilePiece [][] scoringTilesArray = {
 			{new ScoringTilePiece("blue"), new ScoringTilePiece("yellow"), new ScoringTilePiece("red"), new ScoringTilePiece("black"), new ScoringTilePiece("white")},
 			{new ScoringTilePiece("white"), new ScoringTilePiece("blue"), new ScoringTilePiece("yellow"), new ScoringTilePiece("red"), new ScoringTilePiece("black")},
@@ -43,6 +46,7 @@ public class Player {
 		
 	}
 	
+	// sets the players hand when they have selected a tile from either a bowl or the free tile area
 	public void setPlayerHand(ArrayList<UnplayedTile> newHand) {
 		this.playerHand = newHand;
 		this.handColour = newHand.get(0).colour;
@@ -51,6 +55,8 @@ public class Player {
 		System.out.println(this.handColour + " : " + this.handSize);
 	}
 	
+	// adds players hand to the selected awaiting row. If there are too many tiles, any extra are added
+	// to the negative score tracker
 	public void addHandToAwaitingRow(int selectedRowIndex, HashMap<String, Integer> discardedTiles) {
 		// remeber - the validation occurs on the frontend - we can just managae the whats happening here
 		if (handSize <= (awaitingRows[selectedRowIndex].spacesAvailable - awaitingRows[selectedRowIndex].spacesFilled)){
@@ -75,6 +81,8 @@ public class Player {
 		
 	}
 	
+	// if the player is the first player to choose a tile from the free tile area, the 1st player marker
+	// is automatically added to the negative score track, and they are the first player in the next round
 	public void addFirstPlayerMarkerToNegativeTrack() {
 		if (negativeTiles < 7) {
 			negativeScoreTrack[negativeTiles].isFilled = true;
@@ -94,6 +102,8 @@ public class Player {
 		System.out.println(negativeTiles);
 	}
 	
+	// adds tiles to the negative score track, either as overflow or directly by the player (because they have no other valid moves)
+	// if the players negative score tracker is full, all other tiles are added to the discard pile
 	public void addTilesToNegativeScoring(HashMap<String, Integer> discardedTiles) {
 		// this will need to be condensed at some point
 		System.out.println("player class AddHandToNegativeTrack firing");
@@ -120,44 +130,7 @@ public class Player {
 			
 			int tileOverflow = handSize - tilesAddedToNegativeTrack;
 			addTilesToDiscard(tileOverflow, handColour,discardedTiles);
-			/*
-			int oldValue = 0;
-			int newValue = 0;
-			switch (handColour) {
 			
-			case "blue": 
-				oldValue = discardedTiles.get("blue_tiles");
-				newValue = oldValue + tileOverflow;
-				discardedTiles.put("blue_tiles", newValue);
-				System.out.println("blue discard = " + discardedTiles.get("blue_tiles"));
-				break;
-			case "yellow": 
-				oldValue = discardedTiles.get("yellow_tiles");
-				newValue = oldValue + tileOverflow;
-				discardedTiles.put("yellow_tiles", newValue);
-				System.out.println("yellow discard = " + discardedTiles.get("yellow_tiles"));
-				break;
-			case "red": 
-				oldValue = discardedTiles.get("red_tiles");
-				newValue = oldValue + tileOverflow;
-				discardedTiles.put("red_tiles", newValue);
-				System.out.println("red discard = " + discardedTiles.get("red_tiles"));
-				break;
-			case "black": 
-				oldValue = discardedTiles.get("black_tiles");
-				newValue = oldValue + tileOverflow;
-				discardedTiles.put("black_tiles", newValue);
-				System.out.println("black discard = " + discardedTiles.get("black_tiles"));
-				break;
-			case "white": 
-				oldValue = discardedTiles.get("white_tiles");
-				newValue = oldValue + tileOverflow;
-				discardedTiles.put("white_tiles", newValue);
-				System.out.println("white discard = " + discardedTiles.get("white_tiles"));
-				break;
-			default: 
-				System.out.println("you shouldnt see this");
-			}*/
 			
 			negativeTiles = 7;
 		}
@@ -173,6 +146,9 @@ public class Player {
 		}
 	}
 	
+	
+	// if an awaiting row is full, then it can be scored - one tile of that colour is added to the 
+	// scoring grid, the rest are added to the discard pile
 	public void addTilesFromAwaitingToScoring(HashMap<String, Integer> discardedTiles) {
 		for (int i = 0; i < awaitingRows.length; i++){
 			System.out.println("i = " + i);
@@ -197,6 +173,9 @@ public class Player {
 	}
 	
 	// scores the tiles that have been added to the scoring list 
+	
+	// scoring the tiles works from top down. When a tile is added to the scoregrid, the player gains one
+	// point, and get an additional point for any consecutive tiles either to the left/right/above or below
 	
 	
 	public int scoreAddedTiles(int rowIndex, int tilePos) {

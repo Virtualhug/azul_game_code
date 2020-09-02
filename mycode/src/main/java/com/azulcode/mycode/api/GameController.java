@@ -29,38 +29,15 @@ public class GameController {
 		this.gameService = gameService;
 	}
 	
+	// returns the list of games that are active (in this case it will only be the one)
 	@GetMapping
 	public List<Game> getAllGames(){
 		System.out.println("get mapping firing");
 		return gameService.getAllGamesList();
 	}
 	
-	@PostMapping(value = "/listClick")
-	public void getDataFromReact(@RequestBody @RequestParam("name") String name) {
-		//@RequestParam("other") String other;
-		System.out.println("knock knock");
-		System.out.println("who's there?");
-		System.out.println("its " + name);
-		gameService.changeEntry(name);
-		System.out.println(gameService.getPlayerList());
-		
-	}
-	@PostMapping(value = "/buttonClick")
-	public void getOtherDataFromReact(@RequestBody @RequestParam("name") String name) {
-		//@RequestParam("other") String other;
-		System.out.println("I've just narrowly avoided a buggering");
-		System.out.println("and I'm sorely wishing one upon you!!!!");
-		
-		gameService.changeEntry(name);
-		System.out.println(gameService.getPlayerList());
-		
-	}
 	
-	@PostMapping(value = "/compClick")
-	public void getDataFromComp(@RequestBody @RequestParam("swear")List<String> swear ) {
-		System.out.println(swear.get(1));
-	}
-	
+	// starts the game by filling the bowls with four tiles in each bowl
 	@PostMapping(value = "/fillBowls")
 	public void fillTileBowls() {
 		System.out.println("fill bowl firing");
@@ -68,6 +45,8 @@ public class GameController {
 		
 	}
 	
+	// when the player clicks on a tile in a bowl, all tiles of the same colour will be added to the players
+	// hand, the ret go into the "free tile" area
 	@PostMapping(value = "/playerChooseTileFromBowl")
 	public void playerChoosesTileFromBowl(@RequestBody 
 			@RequestParam("bowlId")int bowlId, 
@@ -77,6 +56,9 @@ public class GameController {
 		gameService.playerChoosesTileFromBowl(bowlId, tileId, playerIndex );
 	}
 	
+	//when the player chooses a tile from the free tile area, all the tiles of the same colour are added
+	// to the players hand. If the first player token has not been taken, it is added to the players
+	// negative score tracker, and is now the first player in the next round
 	@PostMapping(value = "/playerChooseTileFromFreeArea")
 	public void playerChooseTileFromFreeArea(@RequestBody
 			@RequestParam("tileId")int tileId,
@@ -91,6 +73,7 @@ public class GameController {
 		gameService.playerAddHandToNegativeTrack(playerIndex);
 	}
 	
+	// the player has selected which awaiting row they have added to their hand to
 	@PostMapping(value = "/addingHandToAwaitingRow")
 	public void addHandToAwaitingRow(@RequestBody
 			@RequestParam("playerIndex")int playerIndex,
@@ -98,13 +81,14 @@ public class GameController {
 		gameService.addHandToAwaitingRow(playerIndex, awaitingRowIndex);
 	}
 	
+	// the scoring tile of the appropriate colour is added to the scoring grid
 	@PostMapping(value = "/addAwaitingRowsToScoringArea")
 	public void addAwaitingRowsToScoringArea(@RequestBody
 			@RequestParam("playerIndex")int playerIndex) {
 		gameService.addAwaitingRowsToScoringArea(playerIndex);
 	}
 	
-	// we'll hold off on this, as i feel its a bit lazy
+	// we'll hold off on this, as i feel its a bit lazy - have kept as a back up
 	@PostMapping(value ="/updatePlayerScoreArea")
 	public void updatePlayerScoreArea(@RequestBody
 			@RequestParam("playerIndex")int playerIndex, 

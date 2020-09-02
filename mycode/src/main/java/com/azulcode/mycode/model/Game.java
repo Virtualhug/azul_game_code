@@ -53,7 +53,7 @@ public class Game {
 		discardedTiles.put("black_tiles", 0);
 		discardedTiles.put("white_tiles", 0);
 		
-		
+		// the tile added to the free tile area at the start of the round is the "first player token"
 		freeTileArea.add(new UnplayedTile(9999, "darkGray", 444));
 		
 		for (int i = 0; i < 9; i++) {
@@ -62,12 +62,7 @@ public class Game {
 		System.out.println(tilesInBagCount);
 		countTilesInBag();
 		System.out.println(tilesInBagCount);
-		/*
-		bowlArea.get(0).tileList.add(new UnplayedTile(0, "red", 0));
-		bowlArea.get(0).tileList.add(new UnplayedTile(1, "yellow", 0));
-		bowlArea.get(0).tileList.add(new UnplayedTile(2, "white", 0));
-		bowlArea.get(0).tileList.add(new UnplayedTile(3, "yellow", 0));
-		*/
+		
 	}
 	// ===================================================== get and set methods ===========================================
 	public String getName() {
@@ -103,6 +98,7 @@ public class Game {
 	
 	//======================================================Actual Azul Code ======================================
 	
+	//counts how many of each tile colour is in the "bag"
 	public void countTilesInBag() {
 		int x = 0;
 		for (String tile: tileTypes) {
@@ -112,6 +108,7 @@ public class Game {
 		tilesInBagCount = x;
 	}
 	
+	// number generator to randomly choose tile colour
 	public int numberGen() {
 		int min = 1;
 		int max = tilesInBagCount;
@@ -122,6 +119,9 @@ public class Game {
 		
 	}
 	
+	// this function removes a tile from the "bag" one at a time - this means that as one colour is picked more frequently,
+	// the less likely it is to be picked again - ensuring that the probability of colours drawn is 
+	// relatively equal
 	public String chooseTileColour(int genNum) {
 		int blueCount = tilesInBag.get("blue_tiles");
 		int yellowCount = tilesInBag.get("yellow_tiles");
@@ -172,11 +172,11 @@ public class Game {
 		return colour;
 		
 	}
-	
+	// each bowl has four tiles of random colours added to it
 	public void setTileColours() {
 		for (int i = 0; i < bowlArea.size(); i++) {
 			for (int x = 0; x < 4; x++) {
-				//bowlArea[i].contents[x] = new UnplayedTile(tilesOnBoard, chooseTileColour(numberGen()), numberGen());
+				
 				bowlArea.get(i).tileList.add(new UnplayedTile(tilesOnBoard, chooseTileColour(numberGen()), i));
 				tilesOnBoard++;
 				
@@ -190,18 +190,16 @@ public class Game {
 	
 	//==================================== Player Actions ===========================================================
 	
+	
+	// player selects a tile from one of the bowls - all tiles of the same colour are added to their hand
 	public void chooseTileFromBowl(int bowlId, int tileId, int playerIndex) {
-		System.out.println("game choosetilefrombowl firing");
-		System.out.println("will you reach me 0");
-		System.out.println(bowlId);
-		System.out.println(tileId);
-		System.out.println(playerIndex);
+		
 		String choiceColour = bowlArea.get(bowlId).getTileColour(tileId);
-		System.out.println("will you reach me 1");
+		
 		ArrayList<UnplayedTile> newHand = new ArrayList<UnplayedTile>();
-		System.out.println("will you reach me 2");
+		
 		ArrayList<UnplayedTile> discard = new ArrayList<UnplayedTile>();
-		System.out.println("will you reach me 3");
+		
 		for (UnplayedTile tile: bowlArea.get(bowlId).tileList) {
 			if (tile.colour == choiceColour) {
 				newHand.add(tile);
@@ -210,6 +208,7 @@ public class Game {
 				discard.add(tile);
 			}
 		}
+		// these loops allow me to check that the correct tiles have gone to the players hand
 		System.out.println("NewHand =============");
 		System.out.println(newHand.size());
 		for(UnplayedTile tile: newHand) {
@@ -230,15 +229,10 @@ public class Game {
 		}
 		players[playerIndex].setPlayerHand(newHand);
 		
-		/*
-		for (int i = 0; i < 9; i++) {
-		System.out.println("bowl " + i + ": ");
-		for (int x = 0; x < 4; x++) {
-			System.out.println(bowlArea.get(i).tileList.get(x).colour);
-		}
-		}*/
+		
 	}
 	
+	// this function handles the "player takes tile from free area action"
 	public void takeTileFromFreeArea(int tileId, int playerIndex) {
 		if (freeTileArea.get(0).id == 9999) {
 			players[playerIndex].addFirstPlayerMarkerToNegativeTrack();
@@ -268,15 +262,17 @@ public class Game {
 		players[playerIndex].setPlayerHand(newHand);
 		
 	}
-	
+	// player selects which awaiting row to add to their hand to
 	public void addHandToAwaitingRow(int playerIndex, int awaitingRowIndex){
 		players[playerIndex].addHandToAwaitingRow(awaitingRowIndex, discardedTiles);
 	}
 	
+	// player adds their hand directly to their negative score track 
 	public void addHandToNegativeTileRow(int playerIndex) {
 		players[playerIndex].addTilesToNegativeScoring(discardedTiles);
 	}
 	
+	//appropriate colour is added to the scoring grid during the scoring round
 	public void addAwaitingRowsToScoringArea(int playerIndex) {
 		players[playerIndex].addTilesFromAwaitingToScoring(discardedTiles);
 	}
