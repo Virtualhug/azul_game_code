@@ -15,82 +15,27 @@ export default class MainBoard extends Component {
     state = {
         name: this.props.name,
         gameState: {
-            tiles: this.props.tilesInBag
-            /*[
-                { blue_tiles: this.props.blue_tiles },
-                { yellow_tiles: this.props.yellow_tiles },
-                { red_tiles: this.props.red_tiles },
-                { black_tiles: this.props.black_tiles },
-                { white_tiles: this.props.white_tiles }
-            ]*/,
+            tiles: this.props.tilesInBag,
             tileTotal: 0,
             tileCount: 0,
-            discardTiles: this.props.discardTiles
-            /*[
-                { blue_tiles: 0 },
-                { yellow_tiles: 0 },
-                { red_tiles: 0 },
-                { black_tiles: 0 },
-                { white_tiles: 0 }
-            ]*/,
+            discardTiles: this.props.discardTiles,
 
             testCounter: 0,
-            bowls: this.props.bowlArea
-                /*
-                [
-                    { id: 0, tileList: [] },
-                    { id: 1, tileList: [] },
-                    { id: 2, tileList: [] },
-                    { id: 3, tileList: [] },
-                    { id: 4, tileList: [] },
-                    { id: 5, tileList: [] },
-                    { id: 6, tileList: [] },
-                    { id: 7, tileList: [] },
-                    { id: 8, tileList: [] },
+            bowls: this.props.bowlArea,
 
-
-
-                ]*/,
-
-            freeTiles: this.props.freeTileArea/*[{ id: 9999, colour: "darkGray", bowlId: null }]*/,
+            freeTiles: this.props.freeTileArea,
             },
         player: {
             playerName: this.props.playerProfileArray[0].playerName,
             playerIndex: 0,
-            playerHand: [],
-            awaitingRows: this.props.playerProfileArray[0].awaitingRows
-
-                /*[
-                { id: 0, colour: null, tilesReq: 1, spacesFilled: 0 },
-                { id: 1, colour: null, tilesReq: 2, spacesFilled: 0 },
-                { id: 2, colour: null, tilesReq: 3, spacesFilled: 0 },
-                { id: 3, colour: null, tilesReq: 4, spacesFilled: 0 },
-                { id: 4, colour: null, tilesReq: 5, spacesFilled: 0 }
-            ]*/,
+            playerHand: this.props.playerProfileArray[0].playerHand,
+            awaitingRows: this.props.playerProfileArray[0].awaitingRows,
             negativeTileCount: this.props.playerProfileArray[0].negativeTilesCount,
-            negativeTiles:this.props.playerProfileArray[0].negativeScoreTrack
-
-            /*[
-                { id: 0, colour: null, scoring: -1, isFilled: false },
-                { id: 1, colour: null, scoring: -1, isFilled: false },
-                { id: 2, colour: null, scoring: -2, isFilled: false },
-                { id: 3, colour: null, scoring: -2, isFilled: false },
-                { id: 4, colour: null, scoring: -2, isFilled: false },
-                { id: 5, colour: null, scoring: -3, isFilled: false },
-                { id: 6, colour: null, scoring: -3, isFilled: false }
-
-            ]*/,
-            scoringTilesArray: this.props.playerProfileArray[0].scoringTilesArray
-                /*[
-                [{ colour: "blue", isFilled: false }, { colour: "yellow", isFilled: false }, { colour: "red", isFilled: false }, { colour: "black", isFilled: false }, { colour: "white", isFilled: false }],
-                [{ colour: "white", isFilled: false }, { colour: "blue", isFilled: false }, { colour: "yellow", isFilled: false }, { colour: "red", isFilled: false }, { colour: "black", isFilled: false }],
-                [{ colour: "black", isFilled: false }, { colour: "white", isFilled: false }, { colour: "blue", isFilled: false }, { colour: "yellow", isFilled: false }, { colour: "red", isFilled: false }],
-                [{ colour: "red", isFilled: false }, { colour: "black", isFilled: false }, { colour: "white", isFilled: false }, { colour: "blue", isFilled: false }, { colour: "yellow", isFilled: false }],
-                [{ colour: "yellow", isFilled: false }, { colour: "red", isFilled: false }, { colour: "black", isFilled: false }, { colour: "white", isFilled: false }, { colour: "blue", isFilled: false }]
-            ]*/,
+            negativeTiles:this.props.playerProfileArray[0].negativeScoreTrack,
+            scoringTilesArray: this.props.playerProfileArray[0].scoringTilesArray,
             tilesScoredThisTurn: [],
             playerScore: this.props.playerProfileArray[0].playerScore,
-            turnSequence: "chooseTile"
+            turnSequence: this.props.playerProfileArray[0].turnSequence
 
         }
     };
@@ -198,6 +143,14 @@ export default class MainBoard extends Component {
             console.log(prevGameState);
             
         });
+    }
+
+    chooseNextPlayer = () => {
+
+    }
+
+    choosePrevPlaer = () => {
+
     }
 
     // fills the bowls with tiles of different colours
@@ -324,25 +277,14 @@ export default class MainBoard extends Component {
                 newPlayerState.newNegativeTiles = this.fillNegativeTile("darkGray", 1);
                 
                 newPlayerState.negativeTileCount++;
-                //this.state.player.playerHand = playerHandList;
-                //this.setState({ freeTiles: newAwaitingTileListColour });
-                //this.setState({ player: newPlayerState });
-                //this.setState({ negativeTileCount: newNegativeListCount })
+                
             } else if (this.state.gameState.freeTiles[0].id !== 9999) {
                 const newAwaitingTileList = this.state.gameState.freeTiles
-                //console.log("no first player free area firing");
-                //console.log(newGameState.freeTiles);
-                //console.log("what was there before");
-                //console.log(this.state.gameState.freeTiles);
+               
                 newGameState.freeTiles = newAwaitingTileList.filter(t => t.colour !== tile.colour);
-                //console.log(newGameState.freeTiles);
-                //console.log("playerHand--------");
-                //console.log(this.state.gameState.freeTiles);
-                //console.log(newPlayerState.playerHand);
+               
                 newPlayerState.playerHand = this.state.player.playerHand.concat(newAwaitingTileList.filter(t => t.colour === tile.colour));
-                //console.log(newPlayerState.playerHand);
-                //this.state.player.playerHand = playerHandList;
-                //this.setState({ freeTiles: newAwaitingTileList });
+                
             }
             // bad practice to do this but its working for now
             let formData = new FormData();
@@ -882,6 +824,9 @@ export default class MainBoard extends Component {
                     <button class="testButton" onClick={this.transferRowsToScoreGrid}>testMe</button>
                     <button class="testLabel" onClick={this.testTheState}>setState</button>
                     <button class="testArray" onClick={() => /*console.table(this.state.player.scoringTilesArray)*/ this.testMe()}>testArray</button>
+                    <button class="next_player_button">next player</button>
+                    <button class ="prev_player_button">prev player</button>
+
                     <ul class="tilesList">
                         <li>blue tiles: {this.state.gameState.tiles.blue_tiles}</li> 
                         <li>yellow tiles:{this.state.gameState.tiles.yellow_tiles}</li>
