@@ -39,6 +39,8 @@ public class Game {
 		this.playerList.add("Lulu");
 		this.playerList.add("Owain");
 		
+		this.players[0].changePlayerTurnSequence("chooseTile");
+		
 		tilesInBag.put("blue_tiles", 20);
 		tilesInBag.put("yellow_tiles", 20);
 		tilesInBag.put("red_tiles", 20);

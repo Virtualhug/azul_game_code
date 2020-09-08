@@ -25,6 +25,7 @@ public class Player {
 	public @JsonProperty("negativeTilesCount")int negativeTiles = 0; 
 	private @JsonProperty("negativeScoreTrack")NegativeScoringTile [] negativeScoreTrack = {new NegativeScoringTile(0, -1), new NegativeScoringTile(1, -1),new NegativeScoringTile(2, -2), new NegativeScoringTile(3, -2), new NegativeScoringTile(4, -2), new NegativeScoringTile(5, -3), new NegativeScoringTile(6, -3)};
 	
+	public @JsonProperty("turnSequence") String turnSequence = "awaitingTurn";
 	
 	// 2d array of the scoring grid. When one player completes an entire row, the game enters its last round
 	private @JsonProperty("scoringTilesArray")ScoringTilePiece [][] scoringTilesArray = {
@@ -341,6 +342,22 @@ public class Player {
 			break;
 		default: 
 			System.out.println("you shouldnt see this");
+		}
+	}
+	
+	public void changePlayerTurnSequence(String turnSeq) {
+		switch(turnSeq) {
+			case "chooseTile":
+				this.turnSequence = "chooseTile";
+				break;
+			case "chooseRow": 
+				this.turnSequence = "chooseRow";
+				break;
+			case "awaitingTurn":
+				this.turnSequence = "awaitingTurn";
+				break;
+			default:
+				System.out.println("player turn sequence default just kicked off");
 		}
 	}
 	
