@@ -20,6 +20,7 @@ public class Game {
 	//private Map<String, int> tilesInBag = new Hashmap<>();
 	
 	public int tilesOnBoard = 0;
+	public @JsonProperty("activePlayerIndex")int activePlayerIndex;
 	
 	private String [] tileTypes = {"blue_tiles", "yellow_tiles", "red_tiles", "black_tiles", "white_tiles"};
 	private HashMap <String, Integer> tilesInBag = new HashMap<String, Integer>();
@@ -29,7 +30,7 @@ public class Game {
 	
 	private List<UnplayedTile> freeTileArea = new ArrayList<UnplayedTile>();
 	private List<TileBowl> bowlArea = new ArrayList<TileBowl>();
-	public Player[]  players = {new Player("Willybum"), new Player("Tom"), new Player("Lulu"), new Player("Ishmael")};
+	public Player[]  players = {new Player("Willybum", 0), new Player("Tom", 1), new Player("Lulu", 2), new Player("Ishmael", 3)};
 	
 	public Game(@JsonProperty("id") UUID id, @JsonProperty("name")String name) {
 		this.name = name;
@@ -39,7 +40,8 @@ public class Game {
 		this.playerList.add("Lulu");
 		this.playerList.add("Owain");
 		
-		this.players[0].changePlayerTurnSequence("chooseTile");
+		this.activePlayerIndex = firstPlayerFirstTurnIndex();
+		this.players[this.activePlayerIndex].changePlayerTurnSequence("chooseTile");
 		
 		tilesInBag.put("blue_tiles", 20);
 		tilesInBag.put("yellow_tiles", 20);
@@ -99,6 +101,15 @@ public class Game {
 	
 	
 	//======================================================Actual Azul Code ======================================
+	
+	//select first player for the first round
+	
+	public int firstPlayerFirstTurnIndex() {
+		int max = 4;
+		Random random = new Random();
+		int randIndex = random.nextInt(max);
+		return randIndex;
+	}
 	
 	//counts how many of each tile colour is in the "bag"
 	public void countTilesInBag() {
@@ -230,7 +241,7 @@ public class Game {
 			freeTileArea.add(tile);
 		}
 		players[playerIndex].setPlayerHand(newHand);
-		
+		players[playerIndex].changePlayerTurnSequence("chooseRow");
 		
 	}
 	
@@ -262,16 +273,31 @@ public class Game {
 		}
 		freeTileArea = remainingTiles;
 		players[playerIndex].setPlayerHand(newHand);
+		players[playerIndex].changePlayerTurnSequence("chooseRow");
 		
 	}
 	// player selects which awaiting row to add to their hand to
 	public void addHandToAwaitingRow(int playerIndex, int awaitingRowIndex){
 		players[playerIndex].addHandToAwaitingRow(awaitingRowIndex, discardedTiles);
+		nextPlayerTurn(playerIndex);
+		
 	}
 	
 	// player adds their hand directly to their negative score track 
 	public void addHandToNegativeTileRow(int playerIndex) {
 		players[playerIndex].addTilesToNegativeScoring(discardedTiles);
+		nextPlayerTurn(playerIndex);
+	}
+	
+	//once a player has added their hand to an awaiting row or neg score tracker, it is the next players turn
+	
+	public void nextPlayerTurn(int playerIndex) {
+		players[playerIndex].changePlayerTurnSequence("awaitingTurn");
+		this.activePlayerIndex++;
+		if(this.activePlayerIndex >= 4) {
+			this.activePlayerIndex = 0;
+		}
+		players[this.activePlayerIndex].changePlayerTurnSequence("chooseTile");
 	}
 	
 	//appropriate colour is added to the scoring grid during the scoring round

@@ -5,6 +5,7 @@ import axios from 'axios';
 export default class GameController extends Component {
 
     state = {
+        selectedPlayerIndex: 0,
         gameProfile: {}
     }
 
@@ -36,6 +37,18 @@ export default class GameController extends Component {
         //console.log(this.state.gameProfile);
     }
 
+    chooseNextPlayer = () => {
+        console.log("choosing next player");
+        console.log(this.state.selectedPlayerIndex);
+        this.state.selectedPlayerIndex++;
+        /*let newPlayerIndex = this.state.selectedPlayerIndex;
+        newPlayerIndex++;
+        if (newPlayerIndex >= 4) {
+            newPlayerIndex = 0;
+        }*/
+        //this.setState({ selectedPlayerIndex: newPlayerIndex });
+    }
+
     render() {
         console.log("gamecontroller rendering");
         console.log(this.props.playerProfileArray);
@@ -46,11 +59,8 @@ export default class GameController extends Component {
                 <MainBoard
                     name={this.props.name}
                     fetchGameProfileFunction={this.props.fetchGameProfileFunction}
-                    /*blue_tiles={this.props.blue_tiles}
-                    red_tiles={this.props.red_tiles}
-                    yellow_tiles={this.props.yellow_tiles}
-                    white_tiles={this.props.white_tiles}
-                    black_tiles={this.props.black_tiles}*/
+                    selectedPlayerIndex={this.state.selectedPlayerIndex}
+                    chooseNextPlayer={this.chooseNextPlayer}
                     tilesInBag={this.props.tilesInBag}
                     discardTiles={this.props.discardTiles}
                     bowlArea={this.props.bowlArea}

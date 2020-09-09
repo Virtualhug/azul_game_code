@@ -13,6 +13,7 @@ import axios from 'axios';
 
 export default class MainBoard extends Component {
     state = {
+        selectedPlayerIndex: this.props.selectedPlayerIndex,
         name: this.props.name,
         gameState: {
             tiles: this.props.tilesInBag,
@@ -24,10 +25,12 @@ export default class MainBoard extends Component {
             bowls: this.props.bowlArea,
 
             freeTiles: this.props.freeTileArea,
-            },
+        },
+        // is it worth changing this to an array of the playerprofiles and cycling through that?
         player: {
-            playerName: this.props.playerProfileArray[0].playerName,
-            playerIndex: 0,
+            playerData: this.props.playerProfileArray[this.props.selectedPlayerIndex],
+            playerName: this.props.playerProfileArray[this.props.selectedPlayerIndex].playerName,
+            playerIndex: this.props.playerProfileArray[0].playerIndex,
             playerHand: this.props.playerProfileArray[0].playerHand,
             awaitingRows: this.props.playerProfileArray[0].awaitingRows,
             negativeTileCount: this.props.playerProfileArray[0].negativeTilesCount,
@@ -144,11 +147,38 @@ export default class MainBoard extends Component {
             
         });
     }
-
+    
     chooseNextPlayer = () => {
-
+        //this.props.chooseNextPlayer();
+        //console.log("====== " + this.props.selectedPlayerIndex);
+        //this.setState({ selectedPlayerIndex: this.props.selectedPlayerIndex });
+        let newGameState = this.state;
+        let newPlayerIndex = this.state.selectedPlayerIndex
+        console.log(this.state.selectedPlayerIndex);
+        newPlayerIndex++;
+        if (newPlayerIndex >= 4) {
+            newPlayerIndex = 0;
+        }
+        newGameState.selectedPlayerIndex = newPlayerIndex;
+        newGameState.player.playerName = this.props.playerProfileArray[newGameState.selectedPlayerIndex].playerName
+        newGameState.player.turnSequence = this.props.playerProfileArray[newGameState.selectedPlayerIndex].turnSequence
+        //console.log(this.state.selectedPlayerIndex);
+        /*
+         playerName: this.props.playerProfileArray[this.props.selectedPlayerIndex].playerName,
+         turnSequence: this.props.playerProfileArray[0].turnSequence,
+            playerIndex: this.props.playerProfileArray[0].playerIndex,
+            playerHand: this.props.playerProfileArray[0].playerHand,
+            awaitingRows: this.props.playerProfileArray[0].awaitingRows,
+            negativeTileCount: this.props.playerProfileArray[0].negativeTilesCount,
+            negativeTiles:this.props.playerProfileArray[0].negativeScoreTrack,
+            scoringTilesArray: this.props.playerProfileArray[0].scoringTilesArray,
+            tilesScoredThisTurn: [],
+            playerScore: this.props.playerProfileArray[0].playerScore,
+            
+         */
+        this.setState({ state: newGameState });
     }
-
+    
     choosePrevPlaer = () => {
 
     }
@@ -820,11 +850,11 @@ export default class MainBoard extends Component {
                         chooseTileFromFreeArea = {this.chooseTileFromFreeArea}
                     />
                     <label class="gameName">{this.state.name}</label>
-                    <label class="playerName">{this.state.player.playerName}</label>
+                    <label class="playerName">{this.state.player.playerData.playerName}</label>
                     <button class="testButton" onClick={this.transferRowsToScoreGrid}>testMe</button>
                     <button class="testLabel" onClick={this.testTheState}>setState</button>
                     <button class="testArray" onClick={() => /*console.table(this.state.player.scoringTilesArray)*/ this.testMe()}>testArray</button>
-                    <button class="next_player_button">next player</button>
+                    <button class="next_player_button" onClick={this.chooseNextPlayer}>next player</button>
                     <button class ="prev_player_button">prev player</button>
 
                     <ul class="tilesList">

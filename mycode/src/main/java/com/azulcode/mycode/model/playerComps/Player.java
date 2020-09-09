@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Player {
 
 	public @JsonProperty("playerName")String playerName;
+	public @JsonProperty("playerIndex") int playerIndex;
 	public @JsonProperty("isPlayerFirst")boolean isPlayerFirst = false;
 	public @JsonProperty("playerScore") int playerScore = 0;
 	
@@ -39,8 +40,9 @@ public class Player {
 			
 	
 	
-	public Player(String name) {
+	public Player(String name, int playerIndex) {
 		this.playerName = name;
+		this.playerIndex = playerIndex;
 		for (int i = 0; i < 5; i++) {
 			awaitingRows[i] = new AwaitingRowPiece(i);
 		}
@@ -349,6 +351,7 @@ public class Player {
 		switch(turnSeq) {
 			case "chooseTile":
 				this.turnSequence = "chooseTile";
+				System.out.println("it is " + this.playerName + "s' turn");
 				break;
 			case "chooseRow": 
 				this.turnSequence = "chooseRow";
