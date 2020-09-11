@@ -54,6 +54,7 @@ public class GameService {
 	
 	public void addHandToAwaitingRow(int playerIndex, int awaitingRowIndex) {
 		System.out.println("Add hand to awaiting row service firing");
+		System.out.println(playerIndex);
 		gameDataInterface.addHandToAwaitingRow(playerIndex, awaitingRowIndex);
 	}
 	
