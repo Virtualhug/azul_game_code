@@ -14,6 +14,7 @@ import axios from 'axios';
 export default class MainBoard extends Component {
     state = {
         selectedPlayerIndex: this.props.selectedPlayerIndex,
+        activePlayerIndex: this.props.activePlayerIndex,
         name: this.props.name,
         gameState: {
             tiles: this.props.tilesInBag,
@@ -30,17 +31,26 @@ export default class MainBoard extends Component {
         player: {
             playerData: this.props.playerProfileArray[this.props.selectedPlayerIndex],
             playerName: this.props.playerProfileArray[this.props.selectedPlayerIndex].playerName,
+            tilesScoredThisTurn: [],
+            /*
             playerIndex: this.props.playerProfileArray[0].playerIndex,
             playerHand: this.props.playerProfileArray[0].playerHand,
             awaitingRows: this.props.playerProfileArray[0].awaitingRows,
             negativeTileCount: this.props.playerProfileArray[0].negativeTilesCount,
             negativeTiles:this.props.playerProfileArray[0].negativeScoreTrack,
             scoringTilesArray: this.props.playerProfileArray[0].scoringTilesArray,
-            tilesScoredThisTurn: [],
+            
             playerScore: this.props.playerProfileArray[0].playerScore,
             turnSequence: this.props.playerProfileArray[0].turnSequence
-
-        }
+            */
+        },
+        players: [
+            this.props.playerProfileArray[0],
+            this.props.playerProfileArray[1],
+            this.props.playerProfileArray[2],
+            this.props.playerProfileArray[3],
+                   
+        ]
     };
 
    // constructor()
@@ -149,9 +159,7 @@ export default class MainBoard extends Component {
     }
     
     chooseNextPlayer = () => {
-        //this.props.chooseNextPlayer();
-        //console.log("====== " + this.props.selectedPlayerIndex);
-        //this.setState({ selectedPlayerIndex: this.props.selectedPlayerIndex });
+       
         let newGameState = this.state;
         let newPlayerIndex = this.state.selectedPlayerIndex
         console.log(this.state.selectedPlayerIndex);
@@ -160,27 +168,12 @@ export default class MainBoard extends Component {
             newPlayerIndex = 0;
         }
         newGameState.selectedPlayerIndex = newPlayerIndex;
-        newGameState.player.playerName = this.props.playerProfileArray[newGameState.selectedPlayerIndex].playerName
-        newGameState.player.turnSequence = this.props.playerProfileArray[newGameState.selectedPlayerIndex].turnSequence
-        //console.log(this.state.selectedPlayerIndex);
-        /*
-         playerName: this.props.playerProfileArray[this.props.selectedPlayerIndex].playerName,
-         turnSequence: this.props.playerProfileArray[0].turnSequence,
-            playerIndex: this.props.playerProfileArray[0].playerIndex,
-            playerHand: this.props.playerProfileArray[0].playerHand,
-            awaitingRows: this.props.playerProfileArray[0].awaitingRows,
-            negativeTileCount: this.props.playerProfileArray[0].negativeTilesCount,
-            negativeTiles:this.props.playerProfileArray[0].negativeScoreTrack,
-            scoringTilesArray: this.props.playerProfileArray[0].scoringTilesArray,
-            tilesScoredThisTurn: [],
-            playerScore: this.props.playerProfileArray[0].playerScore,
-            
-         */
+        
         this.setState({ state: newGameState });
     }
     
-    choosePrevPlaer = () => {
-
+    choosePrevPlayer = () => {
+        console.log(this.state.activePlayerIndex);
     }
 
     // fills the bowls with tiles of different colours
@@ -254,18 +247,18 @@ export default class MainBoard extends Component {
     // rest are then added to the free tile area
 
     emptyBowl = tile => {
-        let newGameState = this.state.gameState;
-        let newPlayerState = this.state.player;
+        let newGameState = this.state
+        //let newPlayerState = this.state.player;
         //let turnSeq = this.state.player.turnSequence;
-        if (newPlayerState.turnSequence === "chooseTile") {
+        if (newGameState.players[this.state.selectedPlayerIndex].turnSequence === "chooseTile") {
             //const newAwaitingTileList = this.state.gameState.freeTiles.concat(this.state.gameState.bowls[tile.bowlId].tileList.filter(t => t.colour !== tile.colour));
-            newGameState.freeTiles = this.state.gameState.freeTiles.concat(this.state.gameState.bowls[tile.bowlId].tileList.filter(t => t.colour !== tile.colour));
-            newPlayerState.playerHand = this.state.player.playerHand.concat(this.state.gameState.bowls[tile.bowlId].tileList.filter(t => t.colour === tile.colour));
-           
+            newGameState.gameState.freeTiles = this.state.gameState.freeTiles.concat(this.state.gameState.bowls[tile.bowlId].tileList.filter(t => t.colour !== tile.colour));
+            newGameState.players[this.state.selectedPlayerIndex].playerHand = this.state.players[this.state.selectedPlayerIndex].playerHand.concat(this.state.gameState.bowls[tile.bowlId].tileList.filter(t => t.colour === tile.colour));
+
             const formData = new FormData();
             formData.append("bowlId", tile.bowlId);
             formData.append("tileId", tile.id);
-            formData.append("playerIndex", this.state.player.playerIndex);
+            formData.append("playerIndex", this.state.players[this.state.selectedPlayerIndex].playerIndex);
 
             axios.post("http://localhost:8080/api/v1/game/playerChooseTileFromBowl", formData).then(() => {
                 console.log("post then firing");
@@ -275,14 +268,14 @@ export default class MainBoard extends Component {
                 this.setState({ player: newPlayerState });
                 this.setState({ gameState: newGameState });*/
             });
-            console.log(newGameState.bowls[tile.bowlId].tileList);
-            newGameState.bowls[tile.bowlId].tileList = [];
+            //console.log(newGameState.bowls[tile.bowlId].tileList);
+            newGameState.gameState.bowls[tile.bowlId].tileList = [];
             console.log("am i working");
-            console.log(newGameState.bowls[tile.bowlId].tileList);
-            newPlayerState.turnSequence = "chooseRow";
-            this.setState({ player: newPlayerState });
-            this.setState({ gameState: newGameState });
-        } else if (newPlayerState.turnSequence !== "chooseTile")
+            //console.log(newGameState.bowls[tile.bowlId].tileList);
+            newGameState.players[this.state.selectedPlayerIndex].turnSequence = "chooseRow";
+            //this.setState({ player: newPlayerState });
+            this.setState({ state: newGameState });
+        } else if (newGameState.players[this.state.selectedPlayerIndex].turnSequence !== "chooseTile")
         {
             console.log("you cannot make that move at this time");
         }
@@ -297,23 +290,23 @@ export default class MainBoard extends Component {
 
     // selecting a tile from the free area
     chooseTileFromFreeArea = tile => {
-        let newGameState = this.state.gameState;
-        let newPlayerState = this.state.player;
-        if (this.state.player.turnSequence === "chooseTile") {
+        let newGameState = this.state;
+        //let newPlayerState = this.state.player;
+        if (this.state.players[this.state.selectedPlayerIndex].turnSequence === "chooseTile") {
             if (this.state.gameState.freeTiles[0].id === 9999) {
                 const newAwaitingTileList = this.state.gameState.freeTiles.filter(t => t.id !== 9999);
-                newGameState.freeTiles = newAwaitingTileList.filter(t => t.colour !== tile.colour);
-                newPlayerState.playerHand = this.state.player.playerHand.concat(newAwaitingTileList.filter(t => t.colour === tile.colour));
-                newPlayerState.newNegativeTiles = this.fillNegativeTile("darkGray", 1);
+                newGameState.gameState.freeTiles = newAwaitingTileList.filter(t => t.colour !== tile.colour);
+                newGameState.players[this.state.selectedPlayerIndex].playerHand = this.state.players[this.state.selectedPlayerIndex].playerHand.concat(newAwaitingTileList.filter(t => t.colour === tile.colour));
+                newGameState.players[this.state.selectedPlayerIndex].negativeScoreTrack = this.fillNegativeTile("darkGray", 1);
                 
-                newPlayerState.negativeTileCount++;
+                newGameState.players[this.state.selectedPlayerIndex].negativeTilesCount++;
                 
             } else if (this.state.gameState.freeTiles[0].id !== 9999) {
                 const newAwaitingTileList = this.state.gameState.freeTiles
                
-                newGameState.freeTiles = newAwaitingTileList.filter(t => t.colour !== tile.colour);
+                newGameState.state.gameState.freeTiles = newAwaitingTileList.filter(t => t.colour !== tile.colour);
                
-                newPlayerState.playerHand = this.state.player.playerHand.concat(newAwaitingTileList.filter(t => t.colour === tile.colour));
+                newGameState.players[this.state.selectedPlayerIndex].playerHand = this.state.players[this.state.selectedPlayerIndex].playerHand.concat(newAwaitingTileList.filter(t => t.colour === tile.colour));
                 
             }
             // bad practice to do this but its working for now
@@ -321,14 +314,14 @@ export default class MainBoard extends Component {
             console.log("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
             console.log(tile.id);
             formData.append("tileId", tile.id);
-            formData.append("playerIndex", this.state.player.playerIndex);
+            formData.append("playerIndex", this.state.players[this.state.selectedPlayerIndex].playerIndex);
             axios.post("http://localhost:8080/api/v1/game/playerChooseTileFromFreeArea", formData).then(() => {
                 console.log("choose tile from free area post firing");
             });
-            newPlayerState.turnSequence = "chooseRow";
-            this.setState({ player: newPlayerState });
-            this.setState({ gameState: newGameState });
-        } else if (this.state.player.turnSequence !== "chooseTile")
+            newGameState.players[this.state.selectedPlayerIndex].turnSequence = "chooseRow";
+            //this.setState({ player: newPlayerState });
+            this.setState({ state: newGameState });
+        } else if (this.state.players[this.state.selectedPlayerIndex].turnSequence !== "chooseTile")
 
         {
             console.log("you cannot make that move at this time");
@@ -348,118 +341,132 @@ export default class MainBoard extends Component {
     // if there are too many tiles to be added to the row, the row is filled, and the excess are then added to the 
     // negative tile row tracker
     transferHandToAwaitingRow = row => {
-        let newPlayerState = this.state.player;
-        if (this.state.player.turnSequence === "chooseRow")
+        let newGameState = this.state;
+        if (this.state.players[this.state.selectedPlayerIndex].turnSequence === "chooseRow")
         {
             
         
-        let checkSpaces = row.spacesFilled + this.state.player.playerHand.length;
+            let checkSpaces = row.spacesFilled + this.state.players[this.state.selectedPlayerIndex].playerHand.length;
         //console.log("check spaces: " + checkSpaces);
             // something is causing an error here++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            console.log(newPlayerState.playerHand);
-            if (this.isMoveValid(this.state.player.playerHand[0].colour, row.id) === true) {
+            console.log(newGameState.players[this.state.selectedPlayerIndex].playerHand);
+            if (this.isMoveValid(this.state.players[this.state.selectedPlayerIndex].playerHand[0].colour, row.id) === true) {
             console.log("move is valid");
             if (row.colour === null) {
                 if (checkSpaces <= row.tilesReq) {
                     
                     //let newRow = this.state.player.awaitingRows;
                     //console.log(newRow);
-                    newPlayerState.awaitingRows[row.id].colour = this.state.player.playerHand[0].colour;
-                    newPlayerState.awaitingRows[row.id].spacesFilled += this.state.player.playerHand.length
+                    newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].colour = this.state.players[this.state.selectedPlayerIndex].playerHand[0].colour;
+                    newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].spacesFilled += this.state.players[this.state.selectedPlayerIndex].playerHand.length
                     let formData = new FormData();
-                    formData.append("playerIndex", this.state.player.playerIndex);
+                    formData.append("playerIndex", this.state.players[this.state.selectedPlayerIndex].playerIndex);
                     formData.append("awaitingRowIndex", row.id);
                     axios.post("http://localhost:8080/api/v1/game/addingHandToAwaitingRow", formData).then(() => {
                         console.log("add tile to awaiting row - empty row, not overfilled,  post firing");
                     });
 
                     
-                    newPlayerState.playerHand = [];
+                    newGameState.players[this.state.selectedPlayerIndex].playerHand = [];
                     //this.setState({ player: newPlayerState });
                 }
                 else if (checkSpaces > row.tilesReq) {
                     console.log("tooo many tiles!!!!!!!");
 
                     //let newRow = this.state.player.awaitingRows;
-                    let tilesLeft = this.state.player.playerHand.length - (newPlayerState.awaitingRows[row.id].tilesReq - newPlayerState.awaitingRows[row.id].spacesFilled);
-                    newPlayerState.awaitingRows[row.id].colour = this.state.player.playerHand[0].colour;
-                    newPlayerState.awaitingRows[row.id].spacesFilled = newPlayerState.awaitingRows[row.id].tilesReq;
+                    let tilesLeft = this.state.players[this.state.selectedPlayerIndex].playerHand.length - (newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].tilesReq - newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].spacesFilled);
+                    newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].colour = this.state.players[this.state.selectedPlayerIndex].playerHand[0].colour;
+                    newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].spacesFilled = newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].tilesReq;
                     
                     // will this one cause trouble?
-                    newPlayerState.negativeTiles = this.fillNegativeTile(this.state.player.playerHand[0].colour, tilesLeft)
+                    console.log(newGameState.players[this.state.selectedPlayerIndex]);
+                    newGameState.players[this.state.selectedPlayerIndex].negativeScoreTrack = this.fillNegativeTile(this.state.players[this.state.selectedPlayerIndex].playerHand[0].colour, tilesLeft);
                     console.log("============================");
-                    newPlayerState.negativeTileCount = newPlayerState.negativeTiles.filter(t => t.isFilled !== false).length;
+                    //console.log(newGameState.players[0]);
+                    //console.log(newGameState.players[2]);
+                    console.log(newGameState.players[this.state.selectedPlayerIndex]);
+                    newGameState.players[this.state.selectedPlayerIndex].negativeTilesCount = newGameState.players[this.state.selectedPlayerIndex].negativeScoreTrack.filter(t => t.isFilled !== false).length;
 
                     let formData = new FormData();
-                    formData.append("playerIndex", this.state.player.playerIndex);
+                    formData.append("playerIndex", this.state.players[this.state.selectedPlayerIndex].playerIndex);
                     formData.append("awaitingRowIndex", row.id);
                     axios.post("http://localhost:8080/api/v1/game/addingHandToAwaitingRow", formData).then(() => {
                         console.log("add tile to awaiting row - empty row,  overfilled,  post firing");
                     });
 
-                    newPlayerState.playerHand = [];
+                    newGameState.players[this.state.selectedPlayerIndex].playerHand = [];
                     //this.setState({ awaitingRows: newRow });
                 }
                 //trying this out
-                newPlayerState.turnSequence = "chooseTile";
-                this.setState({ player: newPlayerState});
+                console.log("line 401 - is this getting hit?");
+                newGameState.players[this.state.selectedPlayerIndex].turnSequence = "awaitingTurn";
+                let nextPlayerIndex = this.nextPlayerTurn(this.state.activePlayerIndex);
+                newGameState.players[nextPlayerIndex].turnSequence = "chooseTile";
+                newGameState.activePlayerIndex = nextPlayerIndex;
+                this.setState({ state: newGameState });
+                
             }
             else if (row.colour !== null) {
-                if (this.state.player.playerHand[0].colour === row.colour) {
+                if (this.state.players[this.state.selectedPlayerIndex].playerHand[0].colour === row.colour) {
                     if (checkSpaces <= row.tilesReq) {
                        
                         //let newRow = this.state.player.awaitingRows;
                        
-                        
-                        newPlayerState.awaitingRows[row.id].spacesFilled += this.state.player.playerHand.length
+
+                        newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].spacesFilled += this.state.players[this.state.selectedPlayerIndex].playerHand.length
 
                         let formData = new FormData();
-                        formData.append("playerIndex", this.state.player.playerIndex);
+                        formData.append("playerIndex", this.state.players[this.state.selectedPlayerIndex].playerIndex);
                         formData.append("awaitingRowIndex", row.id);
                         axios.post("http://localhost:8080/api/v1/game/addingHandToAwaitingRow", formData).then(() => {
                             console.log("add tile to awaiting row - filled row, not overfilled,  post firing");
                         });
 
                         
-                        newPlayerState.playerHand = [];
+                        newGameState.players[this.state.selectedPlayerIndex].playerHand = [];
                         //this.setState({ awaitingRows: newRow });
                     }
                     else if (checkSpaces > row.tilesReq) {
                         console.log("tooo many tiles!!!!!!!");
 
                         //let newRow = this.state.player.awaitingRows;
-                        let tilesLeft = this.state.player.playerHand.length - (newPlayerState.awaitingRows[row.id].tilesReq - newPlayerState.awaitingRows[row.id].spacesFilled);
+                        let tilesLeft = this.state.players[this.state.selectedPlayerIndex].playerHand.length - (newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].tilesReq - newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].spacesFilled);
                         
-                        newPlayerState.awaitingRows[row.id].spacesFilled = newPlayerState.awaitingRows[row.id].tilesReq;
+                        newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].spacesFilled = newGameState.players[this.state.selectedPlayerIndex].awaitingRows[row.id].tilesReq;
                         
 
-                        newPlayerState.negativeTiles = this.fillNegativeTile(this.state.player.playerHand[0].colour, tilesLeft);
+                        newGameState.players[this.state.selectedPlayerIndex].negativeTiles = this.fillNegativeTile(this.state.players[this.state.selectedPlayerIndex].playerHand[0].colour, tilesLeft);
                         
-                        newPlayerState.negativeTileCount = newPlayerState.negativeTiles.filter(t => t.isFilled !== false).length;
+                        newGameState.players[this.state.selectedPlayerIndex].negativeTileCount = newGameState.players[this.state.selectedPlayerIndex].negativeTiles.filter(t => t.isFilled !== false).length;
 
                         let formData = new FormData();
-                        formData.append("playerIndex", this.state.player.playerIndex);
+                        formData.append("playerIndex", this.state.players[this.state.selectedPlayerIndex].playerIndex);
                         formData.append("awaitingRowIndex", row.id);
                         axios.post("http://localhost:8080/api/v1/game/addingHandToAwaitingRow", formData).then(() => {
                             console.log("add tile to awaiting row - filled row, overfilled,  post firing");
                         });
 
-                        newPlayerState.playerHand = [];
+                        newGameState.players[this.state.selectedPlayerIndex].playerData.playerHand = [];
                         //this.setState({ awaitingRows: newRow });
                     }
                     //bad practice but is working for now
-                    newPlayerState.turnSequence = "chooseTile";
-                    this.setState({ player: newPlayerState})
+                    newGameState.players[this.state.selectedPlayerIndex].turnSequence = "awaitingTurn";
+                    let nextPlayerIndex = this.nextPlayerTurn(this.state.activePlayerIndex);
+                    newGameState.players[nextPlayerIndex].turnSequence = "chooseTile";
+                    newGameState.activePlayerIndex = nextPlayerIndex;
+                    this.setState({ state: newGameState });
+                    //this.setState({ activePlayerIndex: nextPlayerIndex });
                 }
-                else if (this.state.player.playerHand[0].colour !== row.colour) {
+                else if (this.state.player.playerData.playerHand[0].colour !== row.colour) {
                     console.log("invalid move");
                 }
-            }
-        } else if (this.isMoveValid(this.state.player.playerHand[0].colour, row.id) === false)
+                }
+            } else if (this.isMoveValid(this.state.players[this.state.selectedPlayerIndex].playerHand[0].colour, row.id) === false)
         {
             console.log("else if - move is invalid");
+            }
         }
-        } else if (this.state.player.turnSequence !== "chooseRow")
+        else if (this.state.players[this.state.selectedPlayerIndex].turnSequence !== "chooseRow")
         {
         console.log("invalid move");
         }
@@ -470,10 +477,10 @@ export default class MainBoard extends Component {
         let isValidBool = true;
         console.log("causing a crash here ======++++++++++++++++=============");
         console.log(rowId);
-        for (let i = 0; i < this.state.player.scoringTilesArray[rowId].length; i++)
+        for (let i = 0; i < this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowId].length; i++)
         {
             
-            if (colour === this.state.player.scoringTilesArray[rowId][i].colour && this.state.player.scoringTilesArray[rowId][i].isFilled === true)
+            if (colour === this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowId][i].colour && this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowId][i].isFilled === true)
             {
                 
                     
@@ -492,32 +499,38 @@ export default class MainBoard extends Component {
     // if the player has no free awaiting rows, then they must directly add their hand to the negtive row
     addToNegativeRow = () =>
     {
-        let newPlayerState = this.state.player;
-        if (this.state.player.turnSequence === "chooseRow") {
-            newPlayerState.negativeTiles = this.fillNegativeTile(this.state.player.playerHand[0].colour, this.state.player.playerHand.length);
+        let newGameState = this.state;
+        if (this.state.players[this.state.selectedPlayerIndex].turnSequence === "chooseRow") {
+            newGameState.players[this.state.selectedPlayerIndex].negativeTiles = this.fillNegativeTile(this.state.players[this.state.selectedPlayerIndex].playerHand[0].colour, this.state.players[this.state.selectedPlayerIndex].playerHand.length);
             //console.log("============================");
-            newPlayerState.negativeTileCount = newPlayerState.negativeTiles.filter(t => t.isFilled !== false).length;
-            newPlayerState.playerHand = [];
-            newPlayerState.turnSequence = "chooseTile";
+            newGameState.players[this.state.selectedPlayerIndex].negativeTilesCount = this.state.players[this.state.selectedPlayerIndex].negativeTiles.filter(t => t.isFilled !== false).length;
+            newGameState.players[this.state.selectedPlayerIndex].playerHand = [];
+            newGameState.players[this.state.selectedPlayerIndex].turnSequence = "chooseTile";
             let formData = new FormData();
-            formData.append("playerIndex", this.state.player.playerIndex);
+            formData.append("playerIndex", this.state.players[this.state.selectedPlayerIndex].playerIndex);
             axios.post("http://localhost:8080/api/v1/game/addingHandToNegativeRow", formData).then(() => {
                 console.log("add to negative row post success");
             });
             //this.setState({ negativeTiles: newNegativeTileList })
-            this.setState({ player: newPlayerState });
-        } else if (this.state.player.turnSequence !== "chooseRow") {
+            newGameState.players[this.state.selectedPlayerIndex].turnSequence = "awaitingTurn";
+            let nextPlayerIndex = this.nextPlayerTurn(this.state.activePlayerIndex);
+            newGameState.players[nextPlayerIndex].turnSequence = "chooseTile";
+            newGameState.activePlayerIndex = nextPlayerIndex;
+            this.setState({ state: newGameState });
+        } else if (this.state.players[this.state.selectedPlayerIndex].turnSequence !== "chooseRow") {
             console.log("invalid move");
         }
     }
 
     // function that transfers excess tiles to the negative row
     fillNegativeTile = (colour, tilesToFill) => {
-
+        console.log("are we even hitting this?");
         //let newPlayerState = 
-        let newNegativeTilesList = this.state.player.negativeTiles;
-        let currentNegativeTileCount = this.state.player.negativeTileCount;
-        let negativeTotal = this.state.player.negativeTileCount + tilesToFill;
+        let newNegativeTilesList = this.state.players[this.state.selectedPlayerIndex].negativeScoreTrack;
+        let currentNegativeTileCount = this.state.players[this.state.selectedPlayerIndex].negativeTilesCount;
+        console.log(currentNegativeTileCount);
+        let negativeTotal = this.state.players[this.state.selectedPlayerIndex].negativeTilesCount + tilesToFill;
+        console.log(negativeTotal);
         if (negativeTotal < 7) {
             let i;
             for (i = currentNegativeTileCount; i < negativeTotal; i++) {
@@ -528,6 +541,8 @@ export default class MainBoard extends Component {
             currentNegativeTileCount = i;
 
             //this.setState({ negativeTiles: newNegativeTilesList });
+            console.log("fill negative tile list fucntion");
+            console.log(newNegativeTilesList);
             return newNegativeTilesList;
         } else if (negativeTotal >= 7)
         {
@@ -546,6 +561,7 @@ export default class MainBoard extends Component {
             this.addToDiscardChooseColour(colourToDiscard, this.state.gameState.discardTiles, numOfTilesToDiscard);
 
             //this.setState({ negativeTiles: newNegativeTilesList });
+            console.log("fill negative tile list fucntion other =======");
             return newNegativeTilesList;
         }
     }
@@ -553,47 +569,47 @@ export default class MainBoard extends Component {
 
     transferRowsToScoreGrid = () => {
         console.log("Scoring function line 582 firing ===================================================");
-        let newPlayerState = this.state.player;
-        let newDiscardTiles = this.state.gameState.discardTiles;
+        let newGameState = this.state;
+        //let newDiscardTiles = this.state.gameState.discardTiles;
         //let rowCheck = this.state.player.awaitingRows;
         //let newScoringTilesArray;
-        for (let i = 0; i < newPlayerState.awaitingRows.length; i++) {
-            if (newPlayerState.awaitingRows[i].tilesReq === newPlayerState.awaitingRows[i].spacesFilled) {
-                let colourToDiscard = newPlayerState.awaitingRows[i].colour;
-                let numOfTilesToDiscard = newPlayerState.awaitingRows[i].tilesReq - 1;
-                this.addToDiscardChooseColour(colourToDiscard, newDiscardTiles, numOfTilesToDiscard);
+        for (let i = 0; i < newGameState.players[this.state.selectedPlayerIndex].awaitingRows.length; i++) {
+            if (newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].tilesReq === newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].spacesFilled) {
+                let colourToDiscard = newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].colour;
+                let numOfTilesToDiscard = newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].tilesReq - 1;
+                this.addToDiscardChooseColour(colourToDiscard, newGameState.gameState.discardTiles, numOfTilesToDiscard);
                
                 console.log("Scoring ===================================================");
-                newPlayerState.scoringTilesArray = this.addToScoreGrid(newPlayerState.awaitingRows[i].id, newPlayerState.awaitingRows[i].colour);
+                newGameState.players[this.state.selectedPlayerIndex].scoringTilesArray = this.addToScoreGrid(newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].id, newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].colour);
                 
-                newPlayerState.awaitingRows[i].spacesFilled = 0;
-                newPlayerState.awaitingRows[i].colour = null;
+                newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].spacesFilled = 0;
+                newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].colour = null;
             }
         }
         
         //let newScore = this.state.player.playerScore;
-        newPlayerState.playerScore += this.negativeScoring();
+        newGameState.players[this.state.selectedPlayerIndex].playerScore += this.negativeScoring();
         // i think the scoring is fixed now======================================++++++++++++++++++++++++++++++++++++++++++
         //console.log("line 381 new score: " + newScore);
-        newPlayerState.negativeTiles = this.clearNegativeTiles(newDiscardTiles);
+        newGameState.players[this.state.selectedPlayerIndex].negativeTiles = this.clearNegativeTiles(newGameState.gameState.discardTiles);
         
         
         //newPlayerState.playerScore = newScore;
-        newPlayerState.tilesScoredThisTurn = [];
-        newPlayerState.negativeTileCount = 0;
+        newGameState.players[this.state.selectedPlayerIndex].tilesScoredThisTurn = [];
+        newGameState.players[this.state.selectedPlayerIndex].negativeTileCount = 0;
         //this.setState({ playerScore: newScore });
         
         //this.setState({ negativeTiles: newNegativeTiles });
         //this.setState({ scoringTilesArray: newScoringTilesArray });
         //this.setState({ awaitingRows: rowCheck });
         let formData = new FormData();
-        formData.append("playerIndex", this.state.player.playerIndex);
+        formData.append("playerIndex", this.state.players[this.state.selectedPlayerIndex].playerIndex);
         axios.post("http://localhost:8080/api/v1/game/addAwaitingRowsToScoringArea", formData).then(() => {
             console.log("transfer awaiting row to scoring row post success");
         });
 
-        this.setState({ discardTiles: newDiscardTiles });
-        this.setState({ player: newPlayerState });
+        //this.setState({ discardTiles: newDiscardTiles });
+        this.setState({ state: newGameState });
     }
 
     // this will need to be fiddled with for the API
@@ -640,17 +656,17 @@ export default class MainBoard extends Component {
     }
     // adds tiles to the scoring grid
     addToScoreGrid = (rowInt, colour) => {
-        console.log("line 532 addToScoreGrid");
+        console.log("line 659 addToScoreGrid");
         let newPlayerState = this.state.player
-        let newScoringTilesArray = this.state.player.scoringTilesArray;
-        for (let i = 0; i < newPlayerState.scoringTilesArray[rowInt].length; i++) {
-            if (newPlayerState.scoringTilesArray[rowInt][i].colour === colour) {
-                newPlayerState.scoringTilesArray[rowInt][i].isFilled = true;
-                newPlayerState.tilesScoredThisTurn.push({ rowInt, i });
+        let newScoringTilesArray = this.state.player.playerData.scoringTilesArray;
+        for (let i = 0; i < newPlayerState.playerData.scoringTilesArray[rowInt].length; i++) {
+            if (newPlayerState.playerData.scoringTilesArray[rowInt][i].colour === colour) {
+                newPlayerState.playerData.scoringTilesArray[rowInt][i].isFilled = true;
+                newPlayerState.tilesScoredThisTurn.push({ rowInt, i }); // do i need to update this with .playerData
 
                 //this.state.player.playerScore++;
-                newPlayerState.playerScore += this.scoreAddedTiles(rowInt, i);
-                console.log("line 446: " + this.state.player.playerScore);
+                newPlayerState.playerData.playerScore += this.scoreAddedTiles(rowInt, i);
+                console.log("line 446: " + this.state.player.playerData.playerScore);
                 break;
             }
         }
@@ -713,11 +729,11 @@ export default class MainBoard extends Component {
         let points = 0;
         for (let i = scoreTilePosition -1; i >= 0; i--)
         {
-            if (this.state.player.scoringTilesArray[rowInt][i].isFilled === true) {
+            if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowInt][i].isFilled === true) {
                 points++;
                 console.log("firing checkScoreTilesleft");
             }
-            else if (this.state.player.scoringTilesArray[rowInt][i].isFilled === false)
+            else if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowInt][i].isFilled === false)
             {
                 i = 0;
                 console.log("breaking checkScoreTilesleft");
@@ -731,11 +747,11 @@ export default class MainBoard extends Component {
     checkScoreTilesRight = (rowInt, scoreTilePosition) => {
         let points = 0;
         for (let i = scoreTilePosition + 1 ; i <= 4; i++) {
-            if (this.state.player.scoringTilesArray[rowInt][i].isFilled === true) {
+            if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowInt][i].isFilled === true) {
                 console.log("firing checkScoreTilesRight");
                 points++;
             }
-            else if (this.state.player.scoringTilesArray[rowInt][i].isFilled === false) {
+            else if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowInt][i].isFilled === false) {
                 i = 4;
                 console.log("breaking checkScoreTilesRight");
                 break;
@@ -749,10 +765,10 @@ export default class MainBoard extends Component {
         let points = 0;
         for (let i = rowInt - 1; i >= 0; i--)
         {
-            if (this.state.player.scoringTilesArray[i][scoreTilePosition].isFilled === true) {
+            if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === true) {
                 points++;
                 console.log("firing checkScoreTilesAbove");
-            } else if (this.state.player.scoringTilesArray[i][scoreTilePosition].isFilled === false){
+            } else if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === false){
                 i = 0;
                 console.log("breaking checkScoreTilesAbove");
                 break;
@@ -766,10 +782,10 @@ export default class MainBoard extends Component {
     checkScoreTilesBelow = (rowInt, scoreTilePosition) => {
         let points = 0;
         for (let i = rowInt + 1; i <= 4; i++) {
-            if (this.state.player.scoringTilesArray[i][scoreTilePosition].isFilled === true) {
+            if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === true) {
                 points++;
                 console.log("firing checkScoreTilesbelow");
-            } else if (this.state.player.scoringTilesArray[i][scoreTilePosition].isFilled === false) {
+            } else if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === false) {
                 i = 4;
                 console.log("breaking checkScoreTilesbelow");
                 break;
@@ -781,10 +797,10 @@ export default class MainBoard extends Component {
 
     negativeScoring = () => {
         let score = 0;
-        for (let i = 0; i < this.state.player.negativeTiles.length; i++)
+        for (let i = 0; i < this.state.players[this.state.selectedPlayerIndex].negativeScoreTrack.length; i++)
         {
-            if (this.state.player.negativeTiles[i].isFilled === true) {
-                score += this.state.player.negativeTiles[i].scoring;
+            if (this.state.players[this.state.selectedPlayerIndex].negativeScoreTrack[i].isFilled === true) {
+                score += this.state.players[this.state.selectedPlayerIndex].negativeScoreTrack.scoring;
             }
         }
         console.log("negative score: " + score);
@@ -793,7 +809,7 @@ export default class MainBoard extends Component {
 
     clearNegativeTiles = (discardList) =>
     {
-        let clearNegativeRow = this.state.player.negativeTiles;
+        let clearNegativeRow = this.state.players[this.state.selectedPlayerIndex].negativeScoreTrack;
         for (let i = 0; i < clearNegativeRow.length; i++) {
             if (clearNegativeRow[i].colour === "darkGray") {
                 console.log("you are now first player");
@@ -810,8 +826,21 @@ export default class MainBoard extends Component {
 
     displayTurnState()
     {
-        let turn = this.state.player.turnSequence;
+        let turn = this.state.players[this.state.selectedPlayerIndex].turnSequence;
         return turn;
+    }
+
+    // next players turn sequence is turned on
+    nextPlayerTurn = (activePlayerIndex) => {
+        let nextPlayer = activePlayerIndex;
+        console.log("line 827 ===========");
+        console.log(nextPlayer);
+        nextPlayer++;
+        if (nextPlayer > 3) {
+            nextPlayer = 0;
+        }
+        return nextPlayer;
+
     }
 
     testSwear()
@@ -822,6 +851,8 @@ export default class MainBoard extends Component {
     render()
     {
         console.log("main board rendering");
+        console.log(this.state.players[0]);
+        console.log(this.state.players[3]);
         return (
             <React.Fragment>
                 <div class="main_window" style={this.styles}>
@@ -831,7 +862,7 @@ export default class MainBoard extends Component {
                     <ScoreBoardTop />
                     <ScoreBoardBottom />
                     <PlayerBoard
-                        player={this.state.player}
+                        player={this.state.players[this.state.selectedPlayerIndex]}
                         transferHandToAwaitingRow={this.transferHandToAwaitingRow}
                         transferHandToNegativeRow={this.addToNegativeRow}//{this.fillNegativeTile}
                     />
@@ -850,12 +881,12 @@ export default class MainBoard extends Component {
                         chooseTileFromFreeArea = {this.chooseTileFromFreeArea}
                     />
                     <label class="gameName">{this.state.name}</label>
-                    <label class="playerName">{this.state.player.playerData.playerName}</label>
-                    <button class="testButton" onClick={this.transferRowsToScoreGrid}>testMe</button>
+                    <label class="playerName">{this.state.players[this.state.selectedPlayerIndex].playerName}</label>
+                    <button class="testButton" onClick={this.transferRowsToScoreGrid}>score tiles</button>
                     <button class="testLabel" onClick={this.testTheState}>setState</button>
                     <button class="testArray" onClick={() => /*console.table(this.state.player.scoringTilesArray)*/ this.testMe()}>testArray</button>
                     <button class="next_player_button" onClick={this.chooseNextPlayer}>next player</button>
-                    <button class ="prev_player_button">prev player</button>
+                    <button class="prev_player_button" onClick={this.choosePrevPlayer}>prev player</button>
 
                     <ul class="tilesList">
                         <li>blue tiles: {this.state.gameState.tiles.blue_tiles}</li> 
@@ -874,7 +905,7 @@ export default class MainBoard extends Component {
                     </ul>
 
                     <ul class="playerScore">
-                        <li>playerScore: {this.state.player.playerScore}</li>
+                        <li>playerScore: {this.state.players[this.state.selectedPlayerIndex].playerScore}</li>
                         <li>turn Sequence: {this.displayTurnState()}</li>
                     </ul>    
                         mainboard

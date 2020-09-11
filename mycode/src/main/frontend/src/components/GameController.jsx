@@ -60,6 +60,7 @@ export default class GameController extends Component {
                     name={this.props.name}
                     fetchGameProfileFunction={this.props.fetchGameProfileFunction}
                     selectedPlayerIndex={this.state.selectedPlayerIndex}
+                    activePlayerIndex={this.props.activePlayerIndex}
                     chooseNextPlayer={this.chooseNextPlayer}
                     tilesInBag={this.props.tilesInBag}
                     discardTiles={this.props.discardTiles}

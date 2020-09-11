@@ -4,7 +4,7 @@ import PlayedTile from '../Tile/actualScoringTile';
 
 export default class PlayedTiles extends Component {
 	state = {
-		tileArray: [
+		/*tileArray: [
 			{ id: 0, tile: this.props.scoringTilesArray[0][0]},
 			{ id: 1, tile: this.props.scoringTilesArray[0][1]},
 			{ id: 2, tile: this.props.scoringTilesArray[0][2]},
@@ -32,7 +32,7 @@ export default class PlayedTiles extends Component {
 			{ id: 24, tile: this.props.scoringTilesArray[4][4]},
 			
 
-		]
+		]*/
 
 	};
     styles = {
@@ -40,13 +40,25 @@ export default class PlayedTiles extends Component {
     };
 
 	renderGridItem() {
+		let newTileArray = [];
+		let count = 0;
+		for (let i = 0; i < 5; i++) {
+			for (let j = 0; j < 5; j++) {
+				
+				//addedTile = this.props.scoringTilesArray[i][j];
+				newTileArray.push({ id: count, tile: this.props.scoringTilesArray[i][j] });
+				count++;
+			}
+		}
+		console.log("new tile array test ==============0000================");
+		console.log(newTileArray);
+		return <React.Fragment>{newTileArray.map(grid => (<div class="gridItem" ><PlayedTile key={grid.id} value={grid.id} tile={grid.tile} /></div>))}</React.Fragment>;
 		
-
-		return <React.Fragment>{this.state.tileArray.map(grid => (<div class="gridItem" ><PlayedTile key={grid.id} value={grid.id} tile={grid.tile} /></div>))}</React.Fragment>;
-
 	};
 
-    render() {
+	render() {
+		console.log("rendering the actual scoring grid 0000000000=================000000000000000000000");
+		console.log(this.state.tileArray);
         return (
             <React.Fragment>
                 <div class="played_tiles" style={this.styles} >

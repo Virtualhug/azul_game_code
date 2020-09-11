@@ -48,7 +48,7 @@ const GameProfile = () => {
             <GameController
                 name={gameProfile.name}
                 fetchGameProfileFunction={fetchGameProfileFunction}
-               
+                activePlayerIndex={gameProfile.activePlayerIndex}
                 tilesInBag={gameProfile.tilesInBag}
                 discardTiles={gameProfile.discardedTiles}
                 playerProfileArray={gameProfile.players}

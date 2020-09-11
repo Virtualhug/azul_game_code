@@ -6,13 +6,13 @@ import UnplayedTile from '../Tile/Tile';
 export default class AwaitingTiles extends Component {
     state = {
         tags: ["tag1", "tag2", "tag3"],
-        rows: [
+        /*rows: [
             { id: 0, value: 1 },
             { id: 1, value: 2 },
             { id: 2, value: 3 },
             { id: 3, value: 4 },
             { id: 4, value: 5 },
-        ]
+        ]*/
         
     };
 
