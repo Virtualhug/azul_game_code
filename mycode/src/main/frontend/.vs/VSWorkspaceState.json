@@ -8,6 +8,6 @@
     "\\src\\components\\Tile",
     "\\src\\components\\tilePool"
   ],
-  "SelectedNode": "\\src\\Game.jsx",
+  "SelectedNode": "\\src\\components\\mainBoard.jsx",
   "PreviewInSolutionExplorer": false
 }
