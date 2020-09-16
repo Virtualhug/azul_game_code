@@ -176,6 +176,17 @@ export default class MainBoard extends Component {
         console.log(this.state.activePlayerIndex);
     }
 
+    scoreAllPLayers = () => {
+        let newState = this.state;
+        console.log("scoring all players");
+        for (let i = 0; i < 4; i++) {
+            console.log("scoring player " + i);
+            newState = this.transferRowsToScoreGrid(i, newState);
+        }
+        // needs tweaking - it appears that some players are having -1 from their score when the shouldnt
+        this.setState({ state: newState });
+    }
+
     // fills the bowls with tiles of different colours
 
     fillBowlLoop = () => {
@@ -567,49 +578,51 @@ export default class MainBoard extends Component {
     }
 
 
-    transferRowsToScoreGrid = () => {
+    transferRowsToScoreGrid = (playerIndex, newGameState) => {
         console.log("Scoring function line 582 firing ===================================================");
-        let newGameState = this.state;
+        //let newGameState = this.state;
         //let newDiscardTiles = this.state.gameState.discardTiles;
         //let rowCheck = this.state.player.awaitingRows;
         //let newScoringTilesArray;
-        for (let i = 0; i < newGameState.players[this.state.selectedPlayerIndex].awaitingRows.length; i++) {
-            if (newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].tilesReq === newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].spacesFilled) {
-                let colourToDiscard = newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].colour;
-                let numOfTilesToDiscard = newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].tilesReq - 1;
+        for (let i = 0; i < newGameState.players[playerIndex].awaitingRows.length; i++) {
+            if (newGameState.players[playerIndex].awaitingRows[i].tilesReq === newGameState.players[playerIndex].awaitingRows[i].spacesFilled) {
+                let colourToDiscard = newGameState.players[playerIndex].awaitingRows[i].colour;
+                let numOfTilesToDiscard = newGameState.players[playerIndex].awaitingRows[i].tilesReq - 1;
                 this.addToDiscardChooseColour(colourToDiscard, newGameState.gameState.discardTiles, numOfTilesToDiscard);
                
                 console.log("Scoring ===================================================");
-                newGameState.players[this.state.selectedPlayerIndex].scoringTilesArray = this.addToScoreGrid(newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].id, newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].colour);
+                newGameState.players[playerIndex] = this.addToScoreGrid(newGameState.players[playerIndex], newGameState.players[playerIndex].awaitingRows[i].id, newGameState.players[playerIndex].awaitingRows[i].colour);
                 
-                newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].spacesFilled = 0;
-                newGameState.players[this.state.selectedPlayerIndex].awaitingRows[i].colour = null;
+                newGameState.players[playerIndex].awaitingRows[i].spacesFilled = 0;
+                newGameState.players[playerIndex].awaitingRows[i].colour = null;
             }
         }
         
         //let newScore = this.state.player.playerScore;
-        newGameState.players[this.state.selectedPlayerIndex].playerScore += this.negativeScoring();
+        newGameState.players[playerIndex].playerScore += this.negativeScoring(playerIndex);
         // i think the scoring is fixed now======================================++++++++++++++++++++++++++++++++++++++++++
         //console.log("line 381 new score: " + newScore);
-        newGameState.players[this.state.selectedPlayerIndex].negativeTiles = this.clearNegativeTiles(newGameState.gameState.discardTiles);
+        newGameState.players[playerIndex].negativeTiles = this.clearNegativeTiles(playerIndex, newGameState.gameState.discardTiles);
         
         
         //newPlayerState.playerScore = newScore;
-        newGameState.players[this.state.selectedPlayerIndex].tilesScoredThisTurn = [];
-        newGameState.players[this.state.selectedPlayerIndex].negativeTileCount = 0;
+        newGameState.players[playerIndex].tilesScoredThisTurn = [];
+        newGameState.players[playerIndex].negativeTileCount = 0;
         //this.setState({ playerScore: newScore });
         
         //this.setState({ negativeTiles: newNegativeTiles });
         //this.setState({ scoringTilesArray: newScoringTilesArray });
         //this.setState({ awaitingRows: rowCheck });
         let formData = new FormData();
-        formData.append("playerIndex", this.state.players[this.state.selectedPlayerIndex].playerIndex);
+        formData.append("playerIndex", this.state.players[playerIndex].playerIndex);
         axios.post("http://localhost:8080/api/v1/game/addAwaitingRowsToScoringArea", formData).then(() => {
             console.log("transfer awaiting row to scoring row post success");
         });
 
         //this.setState({ discardTiles: newDiscardTiles });
-        this.setState({ state: newGameState });
+        // i feel that this bit is somewhat clunky and can be refined so its not setting the state every time it ticks over
+        //this.setState({ state: newGameState });
+        return newGameState;
     }
 
     // this will need to be fiddled with for the API
@@ -655,24 +668,27 @@ export default class MainBoard extends Component {
         }
     }
     // adds tiles to the scoring grid
-    addToScoreGrid = (rowInt, colour) => {
+    addToScoreGrid = (newPlayerState, rowInt, colour) => {
         console.log("line 659 addToScoreGrid");
-        let newPlayerState = this.state.player
+        console.log(newPlayerState);
+        console.log(newPlayerState.playerName);
+        //let newPlayerState = this.state.player
         let newScoringTilesArray = this.state.player.playerData.scoringTilesArray;
-        for (let i = 0; i < newPlayerState.playerData.scoringTilesArray[rowInt].length; i++) {
-            if (newPlayerState.playerData.scoringTilesArray[rowInt][i].colour === colour) {
-                newPlayerState.playerData.scoringTilesArray[rowInt][i].isFilled = true;
-                newPlayerState.tilesScoredThisTurn.push({ rowInt, i }); // do i need to update this with .playerData
+        for (let i = 0; i < newPlayerState.scoringTilesArray[rowInt].length; i++) {
+            if (newPlayerState.scoringTilesArray[rowInt][i].colour === colour) {
+                newPlayerState.scoringTilesArray[rowInt][i].isFilled = true;
+                //newPlayerState.tilesScoredThisTurn.push({ rowInt, i }); // do i need to update this with .playerData
 
                 //this.state.player.playerScore++;
-                newPlayerState.playerData.playerScore += this.scoreAddedTiles(rowInt, i);
-                console.log("line 446: " + this.state.player.playerData.playerScore);
+                newPlayerState.playerScore += this.scoreAddedTiles(rowInt, i);
+                console.log("line 671: " + newPlayerState.playerScore);
                 break;
             }
         }
         console.log(colour + " added to " + rowInt + " on score grid line 451");
-        this.setState({ player: newPlayerState });
-        return newScoringTilesArray;
+        //this.setState({ player: newPlayerState });
+        //return newScoringTilesArray;
+        return newPlayerState;
     }
     // scoring the new tiles that have been added to the scoregrid
     scoreAddedTiles = (rowInt, ScoreTilePosition) =>
@@ -795,21 +811,22 @@ export default class MainBoard extends Component {
         return points;
     }
 
-    negativeScoring = () => {
+    negativeScoring = (playerIndex) => {
         let score = 0;
-        for (let i = 0; i < this.state.players[this.state.selectedPlayerIndex].negativeScoreTrack.length; i++)
+        for (let i = 0; i < this.state.players[playerIndex].negativeScoreTrack.length; i++)
         {
-            if (this.state.players[this.state.selectedPlayerIndex].negativeScoreTrack[i].isFilled === true) {
-                score += this.state.players[this.state.selectedPlayerIndex].negativeScoreTrack.scoring;
+            if (this.state.players[playerIndex].negativeScoreTrack[i].isFilled === true) {
+                console.log(this.state.players[playerIndex].negativeScoreTrack);
+                score += this.state.players[playerIndex].negativeScoreTrack[i].scoring;
             }
         }
         console.log("negative score: " + score);
         return score;
     }
 
-    clearNegativeTiles = (discardList) =>
+    clearNegativeTiles = (playerIndex, discardList) =>
     {
-        let clearNegativeRow = this.state.players[this.state.selectedPlayerIndex].negativeScoreTrack;
+        let clearNegativeRow = this.state.players[playerIndex].negativeScoreTrack;
         for (let i = 0; i < clearNegativeRow.length; i++) {
             if (clearNegativeRow[i].colour === "darkGray") {
                 console.log("you are now first player");
@@ -882,7 +899,7 @@ export default class MainBoard extends Component {
                     />
                     <label class="gameName">{this.state.name}</label>
                     <label class="playerName">{this.state.players[this.state.selectedPlayerIndex].playerName}</label>
-                    <button class="testButton" onClick={this.transferRowsToScoreGrid}>score tiles</button>
+                    <button class="testButton" onClick={this.scoreAllPLayers}>score tiles</button>
                     <button class="testLabel" onClick={this.testTheState}>setState</button>
                     <button class="testArray" onClick={() => /*console.table(this.state.player.scoringTilesArray)*/ this.testMe()}>testArray</button>
                     <button class="next_player_button" onClick={this.chooseNextPlayer}>next player</button>
