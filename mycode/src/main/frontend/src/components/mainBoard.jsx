@@ -182,6 +182,7 @@ export default class MainBoard extends Component {
         for (let i = 0; i < 4; i++) {
             console.log("scoring player " + i);
             newState = this.transferRowsToScoreGrid(i, newState);
+            
         }
         // needs tweaking - it appears that some players are having -1 from their score when the shouldnt
         this.setState({ state: newState });
@@ -680,7 +681,7 @@ export default class MainBoard extends Component {
                 //newPlayerState.tilesScoredThisTurn.push({ rowInt, i }); // do i need to update this with .playerData
 
                 //this.state.player.playerScore++;
-                newPlayerState.playerScore += this.scoreAddedTiles(rowInt, i);
+                newPlayerState.playerScore += this.scoreAddedTiles(rowInt, i, newPlayerState.playerIndex);
                 console.log("line 671: " + newPlayerState.playerScore);
                 break;
             }
@@ -691,15 +692,15 @@ export default class MainBoard extends Component {
         return newPlayerState;
     }
     // scoring the new tiles that have been added to the scoregrid
-    scoreAddedTiles = (rowInt, ScoreTilePosition) =>
+    scoreAddedTiles = (rowInt, ScoreTilePosition, playerIndex) =>
     {
         console.log("scoring the tiles");
         
         let newScore = 0;
         let rowScore = 0;
         let colScore = 0;
-        rowScore += this.scoreAddedRow(rowInt, ScoreTilePosition);
-        colScore += this.scoreAddedCol(rowInt, ScoreTilePosition);
+        rowScore += this.scoreAddedRow(rowInt, ScoreTilePosition, playerIndex);
+        colScore += this.scoreAddedCol(rowInt, ScoreTilePosition, playerIndex);
         newScore = rowScore + colScore;
         if (newScore === 0)
         {
@@ -711,12 +712,12 @@ export default class MainBoard extends Component {
 
     }
 
-    scoreAddedRow = (rowInt, ScoreTilePosition) =>
+    scoreAddedRow = (rowInt, ScoreTilePosition, playerIndex) =>
     {
        
         let newScore = 0;
-        newScore += this.checkScoreTilesRight(rowInt, ScoreTilePosition);
-        newScore += this.checkScoreTilesLeft(rowInt, ScoreTilePosition);
+        newScore += this.checkScoreTilesRight(rowInt, ScoreTilePosition, playerIndex);
+        newScore += this.checkScoreTilesLeft(rowInt, ScoreTilePosition, playerIndex);
         
         
         if (newScore !== 0)
@@ -727,11 +728,11 @@ export default class MainBoard extends Component {
         return newScore;
     }
 
-    scoreAddedCol = (rowInt, ScoreTilePosition) =>
+    scoreAddedCol = (rowInt, ScoreTilePosition, playerIndex) =>
     {
         let newScore = 0;
-        newScore += this.checkScoreTilesAbove(rowInt, ScoreTilePosition);
-        newScore += this.checkScoreTilesBelow(rowInt, ScoreTilePosition);
+        newScore += this.checkScoreTilesAbove(rowInt, ScoreTilePosition, playerIndex);
+        newScore += this.checkScoreTilesBelow(rowInt, ScoreTilePosition, playerIndex);
         
         
         if (newScore !== 0) {
@@ -740,16 +741,16 @@ export default class MainBoard extends Component {
         return newScore;
     }
 
-    checkScoreTilesLeft = (rowInt, scoreTilePosition) =>
+    checkScoreTilesLeft = (rowInt, scoreTilePosition, playerIndex) =>
     {
         let points = 0;
         for (let i = scoreTilePosition -1; i >= 0; i--)
         {
-            if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowInt][i].isFilled === true) {
+            if (this.state.players[playerIndex].scoringTilesArray[rowInt][i].isFilled === true) {
                 points++;
                 console.log("firing checkScoreTilesleft");
             }
-            else if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowInt][i].isFilled === false)
+            else if (this.state.players[playerIndex].scoringTilesArray[rowInt][i].isFilled === false)
             {
                 i = 0;
                 console.log("breaking checkScoreTilesleft");
@@ -760,14 +761,14 @@ export default class MainBoard extends Component {
         return points;
     }
 
-    checkScoreTilesRight = (rowInt, scoreTilePosition) => {
+    checkScoreTilesRight = (rowInt, scoreTilePosition, playerIndex) => {
         let points = 0;
         for (let i = scoreTilePosition + 1 ; i <= 4; i++) {
-            if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowInt][i].isFilled === true) {
+            if (this.state.players[playerIndex].scoringTilesArray[rowInt][i].isFilled === true) {
                 console.log("firing checkScoreTilesRight");
                 points++;
             }
-            else if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[rowInt][i].isFilled === false) {
+            else if (this.state.players[playerIndex].scoringTilesArray[rowInt][i].isFilled === false) {
                 i = 4;
                 console.log("breaking checkScoreTilesRight");
                 break;
@@ -777,14 +778,14 @@ export default class MainBoard extends Component {
         return points;
     }
 
-    checkScoreTilesAbove = (rowInt, scoreTilePosition) => {
+    checkScoreTilesAbove = (rowInt, scoreTilePosition, playerIndex) => {
         let points = 0;
         for (let i = rowInt - 1; i >= 0; i--)
         {
-            if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === true) {
+            if (this.state.players[playerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === true) {
                 points++;
                 console.log("firing checkScoreTilesAbove");
-            } else if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === false){
+            } else if (this.state.players[playerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === false){
                 i = 0;
                 console.log("breaking checkScoreTilesAbove");
                 break;
@@ -795,13 +796,13 @@ export default class MainBoard extends Component {
         return points;
     }
 
-    checkScoreTilesBelow = (rowInt, scoreTilePosition) => {
+    checkScoreTilesBelow = (rowInt, scoreTilePosition, playerIndex) => {
         let points = 0;
         for (let i = rowInt + 1; i <= 4; i++) {
-            if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === true) {
+            if (this.state.players[playerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === true) {
                 points++;
                 console.log("firing checkScoreTilesbelow");
-            } else if (this.state.players[this.state.selectedPlayerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === false) {
+            } else if (this.state.players[playerIndex].scoringTilesArray[i][scoreTilePosition].isFilled === false) {
                 i = 4;
                 console.log("breaking checkScoreTilesbelow");
                 break;
@@ -820,7 +821,7 @@ export default class MainBoard extends Component {
                 score += this.state.players[playerIndex].negativeScoreTrack[i].scoring;
             }
         }
-        console.log("negative score: " + score);
+        console.log("player " + this.state.players[playerIndex].playerName + " negative score: " + score);
         return score;
     }
 
