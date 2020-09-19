@@ -415,6 +415,8 @@ export default class MainBoard extends Component {
                 let nextPlayerIndex = this.nextPlayerTurn(this.state.activePlayerIndex);
                 newGameState.players[nextPlayerIndex].turnSequence = "chooseTile";
                 newGameState.activePlayerIndex = nextPlayerIndex;
+
+                this.checkRoundOver();
                 this.setState({ state: newGameState });
                 
             }
@@ -466,6 +468,8 @@ export default class MainBoard extends Component {
                     let nextPlayerIndex = this.nextPlayerTurn(this.state.activePlayerIndex);
                     newGameState.players[nextPlayerIndex].turnSequence = "chooseTile";
                     newGameState.activePlayerIndex = nextPlayerIndex;
+
+                    this.checkRoundOver();
                     this.setState({ state: newGameState });
                     //this.setState({ activePlayerIndex: nextPlayerIndex });
                 }
@@ -528,6 +532,7 @@ export default class MainBoard extends Component {
             let nextPlayerIndex = this.nextPlayerTurn(this.state.activePlayerIndex);
             newGameState.players[nextPlayerIndex].turnSequence = "chooseTile";
             newGameState.activePlayerIndex = nextPlayerIndex;
+            this.checkRoundOver();
             this.setState({ state: newGameState });
         } else if (this.state.players[this.state.selectedPlayerIndex].turnSequence !== "chooseRow") {
             console.log("invalid move");
@@ -861,6 +866,36 @@ export default class MainBoard extends Component {
 
     }
 
+    // functon that checks if both the bowls and free tile area are empty - if yes, then the bowls are re-filled, players are scored
+    // 1st player is set - 1st player token is re-added to free tile area
+
+    checkRoundOver = () => {
+        let areBowlsEmpty = false;
+        let isFreeTilesEmpty = false;
+        let bowlCount = 0;
+        //console.log(this.state.gameState.bowls.length);
+        for (let i = 0; i < this.state.gameState.bowls.length; i++) {
+            if (this.state.gameState.bowls[i].tileList.length === 0) {
+                bowlCount++;
+            }
+        }
+        console.log(bowlCount);
+        if (bowlCount === this.state.gameState.bowls.length) {
+            areBowlsEmpty = true;
+        }
+
+        if (this.state.gameState.freeTiles.length === 0) {
+            isFreeTilesEmpty = true;
+        }
+        console.log(isFreeTilesEmpty);
+        console.log(areBowlsEmpty);
+        if (isFreeTilesEmpty === false || areBowlsEmpty === false) {
+            console.log("there are still tiles on the board");
+        } else if (isFreeTilesEmpty === true && areBowlsEmpty === true) {
+            console.log("all tiles used, round should end");
+        }
+    }
+
     testSwear()
     {
         console.log("cunt");
@@ -901,7 +936,7 @@ export default class MainBoard extends Component {
                     <label class="gameName">{this.state.name}</label>
                     <label class="playerName">{this.state.players[this.state.selectedPlayerIndex].playerName}</label>
                     <button class="testButton" onClick={this.scoreAllPLayers}>score tiles</button>
-                    <button class="testLabel" onClick={this.testTheState}>setState</button>
+                    <button class="testLabel" onClick={this.checkRoundOver}>chk rnd test</button>
                     <button class="testArray" onClick={() => /*console.table(this.state.player.scoringTilesArray)*/ this.testMe()}>testArray</button>
                     <button class="next_player_button" onClick={this.chooseNextPlayer}>next player</button>
                     <button class="prev_player_button" onClick={this.choosePrevPlayer}>prev player</button>
