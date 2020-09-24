@@ -176,7 +176,7 @@ export default class MainBoard extends Component {
         console.log(this.state.activePlayerIndex);
     }
 
-    scoreAllPLayers = () => {
+    scoreAllPlayers = () => {
         let newState = this.state;
         console.log("scoring all players");
         for (let i = 0; i < 4; i++) {
@@ -416,8 +416,8 @@ export default class MainBoard extends Component {
                 newGameState.players[nextPlayerIndex].turnSequence = "chooseTile";
                 newGameState.activePlayerIndex = nextPlayerIndex;
 
-                this.checkRoundOver();
-                this.setState({ state: newGameState });
+                this.checkRoundOver(newGameState);
+                //this.setState({ state: newGameState });
                 
             }
             else if (row.colour !== null) {
@@ -469,8 +469,8 @@ export default class MainBoard extends Component {
                     newGameState.players[nextPlayerIndex].turnSequence = "chooseTile";
                     newGameState.activePlayerIndex = nextPlayerIndex;
 
-                    this.checkRoundOver();
-                    this.setState({ state: newGameState });
+                    this.checkRoundOver(newGameState);
+                    //this.setState({ state: newGameState });
                     //this.setState({ activePlayerIndex: nextPlayerIndex });
                 }
                 else if (this.state.player.playerData.playerHand[0].colour !== row.colour) {
@@ -532,8 +532,9 @@ export default class MainBoard extends Component {
             let nextPlayerIndex = this.nextPlayerTurn(this.state.activePlayerIndex);
             newGameState.players[nextPlayerIndex].turnSequence = "chooseTile";
             newGameState.activePlayerIndex = nextPlayerIndex;
-            this.checkRoundOver();
-            this.setState({ state: newGameState });
+            //this.checkRoundOver();
+            //this.setState({ state: newGameState });
+            this.checkRoundOver(newGameState);
         } else if (this.state.players[this.state.selectedPlayerIndex].turnSequence !== "chooseRow") {
             console.log("invalid move");
         }
@@ -869,7 +870,7 @@ export default class MainBoard extends Component {
     // functon that checks if both the bowls and free tile area are empty - if yes, then the bowls are re-filled, players are scored
     // 1st player is set - 1st player token is re-added to free tile area
 
-    checkRoundOver = () => {
+    checkRoundOver = (newGameState) => {
         let areBowlsEmpty = false;
         let isFreeTilesEmpty = false;
         let bowlCount = 0;
@@ -891,8 +892,14 @@ export default class MainBoard extends Component {
         console.log(areBowlsEmpty);
         if (isFreeTilesEmpty === false || areBowlsEmpty === false) {
             console.log("there are still tiles on the board");
+            this.setState({ state: newGameState });
+            //window.confirm("tiles still on board - game continues");
         } else if (isFreeTilesEmpty === true && areBowlsEmpty === true) {
             console.log("all tiles used, round should end");
+            this.setState({ state: newGameState });
+            window.confirm("round ending - beginnig scoring");
+            this.scoreAllPlayers();
+            
         }
     }
 
@@ -935,7 +942,7 @@ export default class MainBoard extends Component {
                     />
                     <label class="gameName">{this.state.name}</label>
                     <label class="playerName">{this.state.players[this.state.selectedPlayerIndex].playerName}</label>
-                    <button class="testButton" onClick={this.scoreAllPLayers}>score tiles</button>
+                    <button class="testButton" onClick={this.scoreAllPlayers}>score tiles</button>
                     <button class="testLabel" onClick={this.checkRoundOver}>chk rnd test</button>
                     <button class="testArray" onClick={() => /*console.table(this.state.player.scoringTilesArray)*/ this.testMe()}>testArray</button>
                     <button class="next_player_button" onClick={this.chooseNextPlayer}>next player</button>
