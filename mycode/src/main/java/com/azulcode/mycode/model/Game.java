@@ -111,6 +111,27 @@ public class Game {
 		return randIndex;
 	}
 	
+	// select first player for start of subsequent rounds if they have the first player token
+	public int firstPlayerHasFirstPlayerToken() {
+		int firstPlayerIndex = 0;
+				
+		for (Player player : this.players) {
+			player.changePlayerTurnSequence("awaitingTurn");
+		}
+		for (int i = 0; i < this.players.length; i++) {
+			System.out.println("counting through who should be first player: " + i);
+			if (this.players[i].isPlayerFirst == true) {
+				this.players[i].isPlayerFirst = false;
+				System.out.println("the player who is first is: " + this.players[i].playerName);
+				this.players[i].changePlayerTurnSequence("chooseTile");
+				firstPlayerIndex = i;
+				break;
+			}
+		}
+		return firstPlayerIndex;
+	}
+	
+	
 	//counts how many of each tile colour is in the "bag"
 	public void countTilesInBag() {
 		int x = 0;
@@ -200,6 +221,23 @@ public class Game {
 			}
 		}
 	}
+	
+	// reset the board after the first round
+	
+	public void resestBoardForNextRound() {
+		this.activePlayerIndex = firstPlayerHasFirstPlayerToken();
+		freeTileArea.add(new UnplayedTile(9999, "darkGray", 444));
+		
+		countTilesInBag();
+		if (this.tilesInBagCount >= 36) {
+			System.out.println("more than or equal to 36 tiles in the bag");
+			setTileColours();
+		} else if (this.tilesInBagCount < 36) {
+			System.out.println("gotta start programmng this part");
+		}
+		
+	}
+	
 	
 	//==================================== Player Actions ===========================================================
 	
