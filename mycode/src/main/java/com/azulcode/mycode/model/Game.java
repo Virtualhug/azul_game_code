@@ -224,7 +224,7 @@ public class Game {
 	
 	// reset the board after the first round
 	
-	public void resestBoardForNextRound() {
+	public void resetBoardForNextRound() {
 		this.activePlayerIndex = firstPlayerHasFirstPlayerToken();
 		freeTileArea.add(new UnplayedTile(9999, "darkGray", 444));
 		

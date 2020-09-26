@@ -45,6 +45,13 @@ public class GameController {
 		
 	}
 	
+	// starts the next round by reseting the free tile area, updating the first player and filling the bowls
+	@PostMapping(value = "/resetBoard")
+	public void resetBoardForNextRound() {
+		System.out.println("reset round method firing");
+		gameService.resetBoardForNextRound();
+	}
+	
 	// when the player clicks on a tile in a bowl, all tiles of the same colour will be added to the players
 	// hand, the ret go into the "free tile" area
 	@PostMapping(value = "/playerChooseTileFromBowl")

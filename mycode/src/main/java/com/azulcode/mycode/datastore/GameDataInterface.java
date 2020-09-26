@@ -15,6 +15,8 @@ public interface GameDataInterface {
 	
 	void fillTileBowls();
 	
+	void resetBoardForNextRound();
+	
 	void playerChoosesTileFromBowl(int bowlId, int tileId, int playerIndex );
 	
 	public void playerChoosesTileFromFreeArea(int tileId, int playerIndex);

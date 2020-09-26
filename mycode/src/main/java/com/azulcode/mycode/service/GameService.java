@@ -25,6 +25,8 @@ public class GameService {
 		return gameDataInterface.getGameList();
 	}
 	
+	
+	
 	public List<String> getPlayerList(){
 		return gameDataInterface.getPlayerList();
 	}
@@ -35,6 +37,10 @@ public class GameService {
 	
 	public void fillTileBowls() {
 		gameDataInterface.fillTileBowls();
+	}
+	
+	public void resetBoardForNextRound() {
+		gameDataInterface.resetBoardForNextRound();
 	}
 	
 	public void playerChoosesTileFromBowl(int bowlId, int tileId, int playerIndex ) {

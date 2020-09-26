@@ -43,6 +43,10 @@ public class GameDataStore implements GameDataInterface{
 		GAME_LIST.get(0).setTileColours();
 	}
 	
+	public void resetBoardForNextRound() {
+		GAME_LIST.get(0).resetBoardForNextRound();
+	}
+	
 	public void playerChoosesTileFromBowl(int bowlId, int tileId, int playerIndex ) {
 		System.out.println("game data control playerchoosetilefrombowl firing");
 		GAME_LIST.get(0).chooseTileFromBowl(bowlId, tileId, playerIndex);
