@@ -178,6 +178,7 @@ export default class MainBoard extends Component {
 
     scoreAllPlayers = () => {
         let newState = this.state;
+        let bool = true
         console.log("scoring all players");
         for (let i = 0; i < 4; i++) {
             console.log("scoring player " + i);
@@ -186,8 +187,12 @@ export default class MainBoard extends Component {
         }
         // needs tweaking - it appears that some players are having -1 from their score when the shouldnt
         this.setState({ state: newState });
+        // trying to mess with a promiise
+        console.log("returning bool: " + bool);
+        return bool;
     }
 
+    
     // fills the bowls with tiles of different colours
 
     fillBowlLoop = () => {
@@ -460,7 +465,7 @@ export default class MainBoard extends Component {
                             console.log("add tile to awaiting row - filled row, overfilled,  post firing");
                         });
 
-                        newGameState.players[this.state.selectedPlayerIndex].playerData.playerHand = [];
+                        newGameState.players[this.state.selectedPlayerIndex].playerHand = [];
                         //this.setState({ awaitingRows: newRow });
                     }
                     //bad practice but is working for now
@@ -871,6 +876,18 @@ export default class MainBoard extends Component {
     // 1st player is set - 1st player token is re-added to free tile area
 
     checkRoundOver = (newGameState) => {
+
+        // this promise isnt working as i thought i would
+        const scorePromise = new Promise((resolve, reject) => {
+            if (this.scoreAllPlayers() === true) {
+                window.confirm("i shouldnt be firing of like this");
+                resolve();
+
+            } else {
+                reject();
+            }
+        });
+
         let areBowlsEmpty = false;
         let isFreeTilesEmpty = false;
         let bowlCount = 0;
@@ -898,8 +915,22 @@ export default class MainBoard extends Component {
             console.log("all tiles used, round should end");
             this.setState({ state: newGameState });
             window.confirm("round ending - beginnig scoring");
-            this.scoreAllPlayers();
-            
+            /*
+            this.scoreAllPlayers();.then(() => {
+                axios.post("http://localhost:8080/api/v1/game/resetBoard").then(() => {
+                    console.log("resetting the board");
+                });
+            });*/
+            /*
+            scorePromise.then(() => {
+                axios.post("http://localhost:8080/api/v1/game/resetBoard").then(() => {
+                    console.log("Resetting the board");
+                });
+            });
+            */
+
+
+
         }
     }
 
